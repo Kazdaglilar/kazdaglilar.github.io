@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ornek-1",
+    "category": "ogrenci-firsatlari",
+    "title": "KYK Yurt Başvuruları 2026-2027 Dönemi İçin Erişime Açıldı",
+    "summary": "Kredi ve Yurtlar Kurumu, önümüzdeki eğitim-öğretim yılına yönelik yurt başvuru ekranını öğrencilerin kullanımına sundu. Başvurular e-Devlet üzerinden alınıyor.",
+    "sourceUrl": "https://www.kyk.gov.tr",
+    "sourceName": "KYK",
+    "publishedAt": "2026-08-20T09:00:00.000Z"
+  },
+  {
+    "id": "ornek-2",
+    "category": "savunma-sanayii",
+    "title": "Yerli İnsansız Hava Aracı Projesinde Yeni Test Aşaması Tamamlandı",
+    "summary": "Savunma sanayii alanında geliştirilen yeni nesil insansız hava aracı, planlanan test uçuşlarını başarıyla tamamladı.",
+    "sourceUrl": "https://www.ssb.gov.tr",
+    "sourceName": "SSB",
+    "publishedAt": "2026-08-18T11:30:00.000Z"
+  },
+  {
+    "id": "ornek-3",
+    "category": "ogrenci-firsatlari",
+    "title": "TÜBİTAK 2204-A Lise Öğrencileri Araştırma Projeleri Yarışması Başvuruları Başladı",
+    "summary": "Lise öğrencilerine yönelik araştırma projeleri yarışmasına başvurular açıldı. Başvurular danışman öğretmen aracılığıyla yapılacak.",
+    "sourceUrl": "https://www.tubitak.gov.tr",
+    "sourceName": "TÜBİTAK",
+    "publishedAt": "2026-08-15T08:00:00.000Z"
+  }
+]
