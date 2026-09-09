@@ -1,5 +1,14 @@
 [
   {
+    "id": "ogrenci-1788944738709",
+    "category": "ogrenci-firsatlari",
+    "title": "MEV Tıbbiye Bursu İçin Başvuru Süreci ve Şartları Duyuruldu",
+    "summary": "Milli Eğitim Vakfı tarafından sağlanan burs olanaklarına yönelik başvuru detayları ve kimlerin başvurabileceğine dair bilgiler paylaşıldı. Tıp fakültesi öğrencilerinin faydalanabileceği bu burs programı için gerekli güncel kriterler ve başvuru koşulları açıklandı.",
+    "sourceUrl": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQUEY1bHNzdF9OUUk1Z1pxbkktazZzQnRSRE1oamhxUGI0NkUxRTROM1NBVDI4YXZtV2hzd1VEQWNQbW9aYXowZFU2dXZPZ3U0Mzk2VTRHaE9WY0VPaU5BdXRrVW9tU1pWZmFWcTAyOFpmOGpkOHJGLXM1bGJEVDI5cXpQVWlpYjJiRG83TUtLSUJxZnlScnc?oc=5",
+    "sourceName": "Tıbbiye Bülteni",
+    "publishedAt": "2026-09-09T09:05:38.709Z"
+  },
+  {
     "id": "ogrenci-1788944463200",
     "category": "ogrenci-firsatlari",
     "title": "TEKNOFEST Güneydoğu Etkinliklerinde Spotter Kulesi İçin Başvurular Resmen Başladı",
@@ -1789,14 +1798,5 @@
     "sourceUrl": "https://www.kyk.gov.tr",
     "sourceName": "KYK",
     "publishedAt": "2026-08-20T09:00:00.000Z"
-  },
-  {
-    "id": "ornek-2",
-    "category": "savunma-sanayii",
-    "title": "Yerli İnsansız Hava Aracı Projesinde Yeni Test Aşaması Tamamlandı",
-    "summary": "Savunma sanayii alanında geliştirilen yeni nesil insansız hava aracı, planlanan test uçuşlarını başarıyla tamamladı.",
-    "sourceUrl": "https://www.ssb.gov.tr",
-    "sourceName": "SSB",
-    "publishedAt": "2026-08-18T11:30:00.000Z"
   }
 ]
