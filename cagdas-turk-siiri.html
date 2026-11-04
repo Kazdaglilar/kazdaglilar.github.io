@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Çağdaş Türk Şiiri Testi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+html{color-scheme:light}
+[hidden]{display:none!important}
+/* Layout: tek sütunlu akış — üstte yapışkan ilerleme şeridi, altında sırayla gelen kart */
+:root{
+  --bg:#eef0ec; --surface:#fbfcfa; --ink:#1c232b; --muted:#5b6670; --line:#d5dad3;
+  --accent:#17606a; --accent-soft:#dcebea; --verse:#3c2f5e;
+  --good:#1f7a43; --good-soft:#dcefe2; --bad:#b03a2e; --bad-soft:#f6dfdb;
+  --display:"Alegreya", Georgia, "Times New Roman", serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121619; --surface:#1a2024; --ink:#e4e8e6; --muted:#9aa6ad; --line:#2d363c;
+  --accent:#6fc0c4; --accent-soft:#1d3436; --verse:#c7b8ee;
+  --good:#6fcf92; --good-soft:#1b3326; --bad:#f08a7e; --bad-soft:#3a201d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121619; --surface:#1a2024; --ink:#e4e8e6; --muted:#9aa6ad; --line:#2d363c;
+  --accent:#6fc0c4; --accent-soft:#1d3436; --verse:#c7b8ee;
+  --good:#6fcf92; --good-soft:#1b3326; --bad:#f08a7e; --bad-soft:#3a201d; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar-in{max-width:720px;margin:0 auto;display:grid;gap:8px}
+.bar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.chapter{font-family:var(--display);font-weight:700;font-size:1.05rem;min-width:0}
+.chapter small{font-family:var(--body);font-weight:500;color:var(--muted);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;display:block}
+.stats{display:flex;gap:14px;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;align-items:center;flex-wrap:wrap}
+.stats b{color:var(--ink);font-weight:600}
+.track{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.fill{height:100%;background:var(--accent);width:0;transition:width .35s ease}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:.78rem;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:3px 10px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.chip:focus-visible,.opt:focus-visible,.btn:focus-visible,.side:focus-visible,.mi:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-block:22px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px clamp(16px,4vw,28px);display:grid;gap:14px;min-width:0}
+.kind{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:1.65rem} h2{font-size:1.15rem;margin-top:4px}
+p{margin:0}
+.sec{display:grid;gap:6px}
+.sec ul{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.verse{font-family:var(--display);font-style:italic;font-size:1.12rem;color:var(--verse);border-left:3px solid var(--verse);padding:2px 0 2px 14px;white-space:pre-line;line-height:1.5}
+.src{font-size:.8rem;color:var(--muted)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:520px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.q{font-size:1.12rem;font-weight:500}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:11px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt .k{font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-top:2px;font-variant-numeric:tabular-nums}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}
+.opt.no{border-color:var(--bad);background:var(--bad-soft)}
+.fb{border-radius:8px;padding:12px 14px;display:grid;gap:4px}
+.fb.ok{background:var(--good-soft)} .fb.no{background:var(--bad-soft)}
+.fb strong{font-weight:600}
+.fb.ok strong{color:var(--good)} .fb.no strong{color:var(--bad)}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
+  padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.foot-in{max-width:720px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.hint{font-size:.8rem;color:var(--muted)}
+.btn{font:inherit;font-weight:600;border:none;border-radius:8px;padding:11px 22px;cursor:pointer;background:var(--accent);color:var(--surface)}
+.btn[disabled]{opacity:.35;cursor:default}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.col{display:grid;gap:8px;align-content:start;min-width:0}
+.mi{font:inherit;font-size:.92rem;text-align:left;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;cursor:pointer;min-width:0;overflow-wrap:anywhere}
+.mi.sel{border-color:var(--accent);background:var(--accent-soft)}
+.mi.done{border-color:var(--good);background:var(--good-soft);color:var(--good);cursor:default}
+.mi.shake{border-color:var(--bad);background:var(--bad-soft);animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.stmt{font-family:var(--display);font-size:1.15rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-height:4.5em}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.side{font:inherit;font-weight:600;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:12px;cursor:pointer}
+.side:hover{border-color:var(--accent)}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dot.ok{background:var(--good)} .dot.no{background:var(--bad)} .dot.cur{outline:2px solid var(--accent);outline-offset:1px}
+.res{display:grid;gap:8px}
+.rrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;font-size:.95rem}
+.rbar{grid-column:1/-1;height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.rbar i{display:block;height:100%;background:var(--accent)}
+.big{font-family:var(--display);font-size:2.4rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.retry-tag{font-size:.74rem;color:var(--bad);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.review-tag{font-size:.74rem;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+@media (max-width:480px){ #footHint{display:none} h1{font-size:1.4rem} .match{grid-template-columns:1fr 1fr;gap:8px} .mi{font-size:.85rem;padding:8px} .stats{gap:10px} }
+@media (prefers-reduced-motion: reduce){ .fill{transition:none} .mi.shake{animation:none} }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="bar-row">
+      <div class="chapter" id="chapter"><small>Bölüm</small><span>—</span></div>
+      <div class="stats">
+        <span>İlk denemede doğru <b id="acc">–</b></span>
+        <span>Seri <b id="streak">0</b></span>
+        <span>Tekrar sırası <b id="queue">0</b></span>
+      </div>
+    </div>
+    <div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div>
+    <div class="bar-row">
+      <div class="chips">
+        <button class="chip" id="modeQ" aria-pressed="false" type="button">Bilgi kartlarını atla</button>
+        <button class="chip" id="restart" type="button">Baştan başla</button>
+      </div>
+      <span class="hint" id="pos"></span>
+    </div>
+  </div>
+</header>
+
+<main><div class="wrap" id="stage"></div></main>
+
+<div class="foot"><div class="foot-in"><button class="btn ghost" id="back" type="button" disabled>← Geri</button><span class="hint" id="footHint">Klavye: 1–4 seç · Enter devam · ← geri</span><button class="btn" id="next" type="button" disabled>Devam</button></div></div>
+
+<script>
+/* =========================================================
+   İÇERİK — kaynaklar: Mehmet Kaplan, Şiir Tahlilleri 1; ders notları (1., 3., 4. hafta);
+   Keflioğlu 2023; Gül 2016; Turgay 2012; Makber Mukaddimesi.
+   ========================================================= */
+const MODULES = [
+/* ---------- 0 ---------- */
+{ id:"giris", title:"Çağdaş Türk şiirinin yolu", steps:[
+ {t:"info", kind:"Ders notu · 1. hafta", title:"Din, edebiyat ve ilk İslamî Türk eserleri", secs:[
+   {p:"Din ile edebiyat arasındaki ilişki çok eskidir. Güzel sanatların başlangıcını araştıranlar musikinin, raksın, şiirin ve edebiyatın menşeinin din olduğu kanaatindedir. Dil değişip geliştiğine göre edebiyatın da değişmesi mukadderdir."},
+   {h:"İslamiyet'in kabulünden sonra", list:["Yeni dinî içerik ve İslamî kavramlar girer, İran edebiyatı etkisi başlar.","Yerli Türk zevki, eski halk edebiyatı unsurları ve millî karakter korunur."]},
+   {h:"İlk Türk-İslam eserleri", list:["Kutadgu Bilig → Yusuf Has Hâcib","Dîvânu Lügati't-Türk → Kaşgarlı Mahmud","Atabetü'l-Hakâyık → Edib Ahmed b. Mahmud Yüknekî","Dîvân-ı Hikmet → Hoca Ahmed Yesevî"]},
+   {h:"Anadolu", p:"Yunus Emre, Mevlânâ'nın Farsça, Hacı Bektaş-ı Velî'nin Arapça neşrettiği tasavvuf düşüncesini Türkçe söyledi. Yunus Divanı Anadolu'da bilinen ilk divandır; aruzlu gazellerin yanında heceyle yazılmış dörtlükler de içerir."}
+ ]},
+ {t:"match", q:"İlk Türk-İslam eserlerini yazarlarıyla eşleştir.", pairs:[["Kutadgu Bilig","Yusuf Has Hâcib"],["Dîvânu Lügati't-Türk","Kaşgarlı Mahmud"],["Atabetü'l-Hakâyık","Edib Ahmed"],["Dîvân-ı Hikmet","Ahmed Yesevî"]]},
+ {t:"info", kind:"Ders notu · 1. hafta", title:"Tanzimat: yeni bir yol arayışı", secs:[
+   {list:["Tanzimat Fermanı: 3 Kasım 1839, Gülhane Parkı, Abdülmecid Han zamanı. Osmanlı başka bir medeniyet dairesine girdiğini kabul eder.","Siyasî gerileme, XIX. asırda Batı tarzı söyleyişe ve dilde sadeleşmeye doğru bir arayış doğurur.","Batılılaşma geleneksel olarak Şinasi ile başlatılır. Orhan Okay'a göre itibarî başlangıç 1859 yılıdır.","Şiire Batı tesiri tedricen girer; divan şiirinin şekil ve kaideleri direnir. Yenilikçiler bile asrın sonuna kadar divan tarzından tamamen kurtulamaz.","Harbiye ve Tıbbiye'de Avrupalı hocalardan okuyan gençler gelenekten kopar; dinin sorgulanamaz sayılan bileşenleri değişim isteyenleri krize sokar.","Bu krizin şiirdeki ilk belirtileri Âkif Paşa, Şinasi ve Ziya Paşa'da görülür."]}
+ ]},
+ {t:"mc", q:"Orhan Okay'a göre edebiyatta Batılılaşmanın itibarî başlangıcı olarak hangi yıl kabul edilebilir?", o:["1859","1839","1876","1908"], a:0, why:"Şinasi birçok hususta ilk olduğu için, onun bazı eserleri esas alınarak 1859 yılı itibarî başlangıç sayılır. 1839 Tanzimat Fermanı'nın yılıdır."},
+ {t:"mc", q:"Tanzimat'ta geleneksel din anlayışının değişmeye başladığına dair ilk belirtiler hangi şairlerde görülür?", o:["Âkif Paşa, Şinasi, Ziya Paşa","Namık Kemal, Hâmid, Ekrem","Nâcî, Hâmid, Mehmet Âkif","Fikret, Haşim, Yahya Kemal"], a:0, why:"Ders notu ve Keflioğlu makalesi bu üç ismi, değişen din algısının ilk temsilcileri olarak sayar: Adem Kasidesi, Münâcât, Terci-i Bend."},
+ {t:"info", kind:"Kaplan · Netice", title:"Yeni Türk şiirinin seyri", secs:[
+   {p:"Yüzyıllarca hemen hemen aynı kalan eski edebiyata karşılık, Tanzimat'tan sonraki edebiyatın başlıca hususiyeti değişikliktir. Her nesil yeni bir şey getirir; şahsiyet ve orijinallik asli kıymet olur."},
+   {h:"Üç kaynak", p:"Bu devir edebiyatı Batı, Divan ve Halk edebiyatından gelen tesirlerin, nesillere ve şahsiyetlere göre değişen terkip denemeleridir. Onu sadece \"Batı tesiri altında Türk edebiyatı\" diye tanımlamak doğru olmaz."},
+   {h:"Varlığa dönüş: kim kâinatta ne görür?", list:["Şinasi: ilahî bir nizam","Ziya Paşa: hayret verici bir anlaşılmazlık","Hâmid: hayranlıkla seyredilecek bir güzellik","Sâdullah Paşa: ilimle ortaya çıkan sırlar","Servet-i Fünuncular: tabiatı ressam gibi seyreder","Haşim: varlığın ötesinde bir âlem","Yahya Kemal: tabiatta ıztırap ve teselli"]},
+   {h:"Muhtevacılık – şekilcilik diyalektiği", list:["Tanzimat şiiri, Divan'ın şekilciliğine karşı bir muhteva hareketidir.","Nâcî bu muhtevacılığa karşı bir nevi neo-klasisizmi savunur; dışı imar ederken içi ihmal eder.","Servet-i Fünun muhteva ile şekil arasında ilk dengeyi kurar ama dilde yanılır.","1908'den sonra Âkif, Mehmed Emin ve Gökalp ile yeni bir muhtevacılık başlar. Haşim \"saf şiir\" fikriyle, Yahya Kemal yeni bir neo-klasisizmle karşı çıkar."]}
+ ]},
+ {t:"match", q:"Kaplan'a göre şairin kâinatta gördüğü şeyi eşleştir.", pairs:[["Şinasi","İlahî bir nizam"],["Ziya Paşa","Hayret verici anlaşılmazlık"],["Abdülhak Hâmid","Hayranlıkla seyredilecek güzellik"],["Yahya Kemal","Tabiatta ıztırap ve teselli"]]},
+ {t:"mc", q:"Kaplan'a göre yeni Türk edebiyatı hangi üç kaynaktan gelen tesirlerin terkibidir?", o:["Batı, Divan ve Halk edebiyatı","Fars, Arap ve Fransız edebiyatı","Tasavvuf, medrese ve saray","Halk, tekke ve Servet-i Fünun"], a:0, why:"Netice bölümü: Bu devir edebiyatı Batı, Divan ve Halk edebiyatından gelen tesirlerin başarılı veya başarısız terkip denemeleridir."},
+ {t:"tf", q:"Kaplan'a göre yeni Türk edebiyatını sadece \"Batı tesiri altında Türk edebiyatı\" diye tanımlamak doğrudur.", a:false, why:"Yanlış. Yahya Kemal eskiyi diriltir, Gökalp en eskiye döner; Batı tesiri her nesilde ve şahsiyette ayrı bir şekil alır."}
+]},
+/* ---------- 1 ---------- */
+{ id:"adem", title:"Âkif Paşa · Adem Kasidesi", steps:[
+ {t:"info", kind:"Şiir kartı", title:"Kaside-i Adem", poet:"Âkif Paşa", verse:"Var ise andadır ancak yoğise yoktur yok\nRahat istersen eğer eyle temennâ-yı adem", secs:[
+   {h:"Künye", p:"69 beyitlik kaside. Redifi \"adem\", yani yokluktur. Âkif Paşa Tanzimat'a yetişmiş ama zihniyet bakımından eskidir. Kasideyi gözden düştüğü ve ağır hasta olduğu bir devirde yazar."},
+   {h:"Ne anlatır?", p:"Hayattan bıkmış, ümitsiz bir insanın varlıktan nefretini ve yokluğa duyduğu özlemi. Yokluk; gamın, kederin, korku ve ümidin olmadığı mutlak bir huzur ülkesi olarak övülür. Şair onu cennete benzetir, sonra \"yanıldım\" diyerek yokluğun huzurunu cennetten de üstün tutar."},
+   {h:"Ana fikir", p:"Varlık ıztıraptır; insanı ıztıraptan ancak yokluk kurtarır."},
+   {h:"Bedbinliğin üç kaynağı", p:"Bir medeniyetin (eski zihniyet dünyayı kötü görür), bir devrin (Osmanlı'nın büyük ümitsizliği) ve bir şahsın (muhteris, mevki düşkünü, kindar; emelleri gerçekleşmemiş, hasta) bedbinliği eski şiirin süslü diliyle birleşir."}
+ ]},
+ {t:"mc", q:"Adem Kasidesi'nin redifi olan \"adem\" kelimesi ne anlama gelir?", o:["Yokluk","İlk insan Hz. Âdem","Ölümsüzlük","Cennet"], a:0, why:"Adem = yokluk. Şair bir beyitte Hz. Âdem ile kelime oyunu da yapar (insanlar \"yokluğun çocukları\"), ama redif yokluk anlamındadır."},
+ {t:"mc", q:"Adem Kasidesi esas olarak neyi anlatır?", o:["Varlıktan nefreti ve yokluğu mutlak bir huzur ülkesi olarak özlemeyi","Allah'ın kâinattaki nizamını ve kulun af dilemesini","Vatan ve hürriyet uğrunda çekilen ıztırabı","Tabiat karşısında duyulan hayranlığı"], a:0, why:"Kaplan: Şair varlığı beğenmiyor, ondan kurtulmak istiyor; göçmek istediği yer ne dünya ne ahirettir, yokluktur."},
+ {t:"mc", q:"Kaplan'a göre Âkif Paşa'yı bu kadar ıztıraba düşüren şahsi sebep nedir?", o:["İhtiraslarına ve emellerine ulaşamaması, üstelik hasta olması","Eşini kaybetmesi","Sürgüne gönderilmesi","İnancını kaybetmesi"], a:0, why:"\"Ber-murâd olmayacak ben yere geçsin âlem\": emellerine ulaşamayan Paşa, kendisini mesut etmeyen âlemin yok olmasını ister. 38. beyit hastalığına işaret eder."},
+ {t:"info", kind:"Kaplan'ın tahlili", title:"Kasidenin üç cephesi", poet:"Âkif Paşa", verse:"İki kâğıttan ibâret nüsah-ı kevn ü mekân\nBiri ibkâ-yı vücûd u biri ifnâ-yı adem", secs:[
+   {h:"1 · Psikolojik (34–52. beyitler)", p:"\"Ben o bîzâr-ı vücûdum ki…\", \"Öyle bîmâr-ı gamım kim…\" diye başlayan beyitlerde şair ne kadar muzdarip olduğunu tekrar ve benzetmelerle anlatır. Maddi ve manevi ıztırap bir aradadır."},
+   {h:"2 · Metafizik (8–23. beyitler)", p:"Kâinatta varlık ile yokluk bir aradadır; var olan yok olur, yokluk varlıktan güçlüdür. Mâder-i dehr (zaman-ana) doğurur, bâbâ-yı adem (yokluk-baba) alır götürür. Kâinat iki sayfalık bir kitaptır: biri varlığı tutma çabası, öteki yokluğun onu silmesi."},
+   {h:"3 · Estetik", p:"Fikirler büyük ölçüde kelime oyunlarından, benzetmelerden ve kafiyeden doğar. Âkif Paşa bu yönüyle tam bir Divan şairidir: fikir ile oyunu karıştırır. Kaside içinde bir gazel bile söyler (55–63)."},
+   {h:"Üslup", list:["\"Adem\" redifi bir musallat fikir gibi kasideyi hükmü altına alır.","Mücerret \"adem\" müşahhas şeylere benzetilir: sahbâ, mînâ, sahrâ, deryâ, bâbâ, ankâ, lâlâ, kâğıt, hayme, âhû…","Tezat makinesi: ıztıraba karşı huzur, varlığa karşı yokluk, hayata karşı ölüm.","Medrese dili ve ıstılahları (vücûd, cevher, araz, selb, icâb, kaziye, netice…); Farsça ikili, üçlü terkipler.","Övülen yönü: cümleleri mısralara rahat yerleştirir, tabii bir nazım sentaksı kurar."]}
+ ]},
+ {t:"mc", q:"Kaplan, Adem Kasidesi'ni hangi üç cepheden inceler?", o:["Psikolojik, metafizik, estetik","Tarihî, sosyal, dinî","Şekil, dil, vezin","Ahlaki, siyasi, felsefi"], a:0, why:"Kaplan'a göre kasidenin birbiriyle yakından ilgili başlıca üç cephesi vardır: psikolojik, metafizik ve estetik."},
+ {t:"mc", q:"Kaplan'a göre Âkif Paşa'nın yokluk tasavvuru Hint Nirvana'sından nasıl ayrılır?", o:["Nirvana'da istekler yok edilerek huzura erilir; Âkif Paşa ise arzularını gaye bilir ve varlığı onları tatmin etmediği için kötüler","Nirvana bir ülkedir, Âkif Paşa'nın yokluğu ise bir ruh hâlidir","Nirvana ölümden sonradır, Âkif Paşa'nın yokluğu bu dünyadadır","Hiçbir farkı yoktur; tamamen aynıdır"], a:0, why:"Hint felsefesinde ıztırap isteklerin neticesidir, istekler yok edilince saadet gelir. Âkif Paşa'da böyle bir fikir yoktur."},
+ {t:"mc", q:"Âkif Paşa'yı tasavvuftaki yokluk anlayışından ayıran temel fark nedir?", o:["Tanrı üzerinde değil, yokluk üzerinde ısrar etmesi; kaside boyunca Tanrı'ya yer vermemesi","Yokluğu hiç övmemesi","Varlığı Tanrı'nın tecellisi olarak sevmesi","Aşkı merkeze alması"], a:0, why:"Kaplan: Bütün kaside boyunca Tanrı ile değil, ıztırap verici varlık ve kurtarıcı yokluk ile baş başa kalırız. Kacıroğlu da Allah düşüncesine yer vermemesini gelenekte olmayan taraf sayar."},
+ {t:"tf", q:"Kaplan'a göre Adem Kasidesi'ndeki fikirler, psikolojik ve metafizik düşünceden çok kelime oyunlarından ve kafiyeden doğmuş gibidir.", a:true, why:"Doğru. \"Yok\" kelimesinin varlığından yokluğun varlığına geçmek bir kelime oyunudur. Benzetmelerin çoğu da kafiyeden doğar."},
+ {t:"mc", q:"Kaplan, Adem Kasidesi'ni nasıl nitelendirir?", o:["Ölüm fikrine dayanan bir medeniyetin en son karanlık şarkısı","Yeni edebiyatın ilk müjdecisi","Cemiyet mistisizminin ilk örneği","Halk diline gidişin başlangıcı"], a:0, why:"Kaplan: Âkif Paşa bir bitiş ve sondur; adeta bir dünyanın çöküşünü anlatır."},
+ {t:"mc", q:"Aşağıdaki mısralardan hangisi Adem Kasidesi'ne aittir?", o:["Rahat istersen eğer eyle temennâ-yı adem","Vahdet-i zâtına aklımca şehâdet lâzım","Cihan titrer sebât-ı pây-ı erbâb-ı metânetten","Bu yerlerde doğan bir şâir olmak pek tabiîdir"], a:0, why:"Diğerleri sırasıyla Şinasi (Münâcât), Namık Kemal (Hürriyet Kasidesi) ve Hâmid (Külbe-i İştiyak)."}
+]},
+/* ---------- 2 ---------- */
+{ id:"munacat", title:"Şinasi · Münâcât", steps:[
+ {t:"info", kind:"Şiir kartı", title:"Münâcât", poet:"Şinasi", verse:"Hak Teâlâ azamet âleminin pâdişehi\nLâ-mekândır olamaz devletinin taht-gehi", secs:[
+   {h:"Künye", p:"20 beyit. Konu eskidir (Allah'a yakarış), ama işleyiş ve üslup yenidir."},
+   {h:"Ne anlatır?", p:"İlk kısımda Tanrı ile kâinat arasındaki münasebeti anlatır: Allah azamet âleminin padişahıdır, mekândan münezzehtir. Yer onun emriyle döner, mevsimler değişir; güneş ve ay rahmetinin ışığı, yıldızlar heybetinin kıvılcımlarıdır. Her biri onun varlığının parlak delilidir. İkinci kısımda (10–20) şair kendisi ile Tanrı arasındaki münasebeti anlatır: günahını, pişmanlığını, ümitsizliğini, sonunda Allah'ın sonsuz keremine güvenip huzura erişini."},
+   {h:"Ana fikirler (Kaplan)", list:["Tanrı kâinata hâkimdir; kâinat Tanrı'nın varlığını ispat eder.","Tanrı günahkâr kulunu bağışlar."]},
+   {h:"Ayırıcı özellik", p:"Şinasi, eski münâcâtlar gibi yeryüzü teferruatına (çiçekler, bitkiler) dalmaz. Daha çok gözle görülen âleme, özellikle yıldızlara ve astronomik varlıklara bakar, kâinatın bütünlüğü içinde Tanrı'yı gösterir."}
+ ]},
+ {t:"mc", q:"Münâcât'ın ilk kısmında Şinasi Allah'ın varlığına neyi delil olarak gösterir?", o:["Kâinattaki nizamı; yıldızlar, güneş, ay ve yerin hareketi gibi gözle görülen varlıkları","Kur'an ayetlerini","Tasavvuftaki aşk ve vecd hâlini","Peygamberlerin mucizelerini"], a:0, why:"Kaplan: Akli bir tip olan Şinasi, Tanrı'yı ispat için \"objektif\" bir delil olarak kâinatı gösterir. Kacıroğlu'na göre Kur'an'a hiç atıf yapmaz."},
+ {t:"mc", q:"Münâcât'ın iki ana fikri hangisidir?", o:["Kâinat Tanrı'nın varlığını ispat eder; Tanrı günahkâr kulunu bağışlar","Varlık ıztıraptır; yokluk kurtuluştur","Hürriyet ebedîdir; zulüm geçicidir","Tabiat şiirdir; şair tabiatın çocuğudur"], a:0, why:"Kaplan, şiirin iki kısmını bu iki basit fikirde toplar: 1) Tanrı kâinata hâkimdir, 2) Tanrı insanı bağışlar."},
+ {t:"info", kind:"Kaplan + Keflioğlu", title:"Akıl ile gönül arasında", poet:"Şinasi", verse:"Vahdet-i zâtına aklımca şehâdet lâzım\nCân u gönlümle münâcât u ibâdet lâzım", secs:[
+   {h:"Aklın şehadeti", p:"Eskiler için Tanrı akılla ispat edilemezdi; eski edebiyat akla karşı aşkı savunur, kalbin şehadetini üstün tutar. Fuzûlî: \"Bilmek bu yeter ki bilmek olmaz.\" Şinasi ise Allah'ın birliğine \"aklınca şehadet\" arar. Kaplan bunu Avrupa'da XVIII. yüzyıldan sonra gelişen akli ve ilmî dinciliğin tesirine bağlar."},
+   {h:"İç göze dönüş", p:"Delilin çürüklüğünü sezmiş gibi dış dünyadan insana döner: \"Göremez zâtını mahlûkunun âdî nazarı / Hisseder nûrunu ammâ ki basîret basarı.\" Sonunda Şark'ın eski fikrine döner."},
+   {h:"Pozitivist arka plan (Keflioğlu)", p:"Paris yıllarında Ernest Renan ve Auguste Comte'un öğrencisi Littré ile yakınlaşır. Münâcât'ın hareket noktası ilham veya iman değil, akıldır. Kolcu'ya göre bütün beyitler 11. beyti söylemek ve ondan doğan günah duygusundan sıyrılmak için yazılmıştır."},
+   {h:"İç konuşma", p:"12–18. beyitler içten yapılan bir diyalogdur: \"Ne dedim, tevbeler olsun, bu da fi'l-i şerdir!\" Kaplan'a göre bu cinsten iç konuşma edebiyatımızda yenidir ve Fransız şiirinin tesirini gösterir. Şüphe değil, iman ve emniyet ifade eder."}
+ ]},
+ {t:"mc", q:"\"Vahdet-i zâtına aklımca şehâdet lâzım\" mısraı neyi gösterir?", o:["Şinasi'nin Allah'ın birliğini akılla da kabul etmek istediğini","Allah'ın varlığını reddettiğini","Tasavvufi aşkla Allah'a ulaştığını","Yokluğu övdüğünü"], a:0, why:"Kaplan: Şinasi bir fikri aklıyla da kabul etmek ister; bu fikir Allah'ın varlığı ve birliğidir. Bu tavır eskilerden ayrı bir davranış tarzıdır."},
+ {t:"mc", q:"Kaplan'a göre Şinasi'nin \"aklınca şehadet\" araması hangi tesirden ileri gelir?", o:["Avrupa'da XVIII. yüzyıldan sonra gelişen akli ve ilmî dincilikten","Yunus Emre'nin ilahilerinden","Fuzûlî'nin münâcâtlarından","Medrese kelamından"], a:0, why:"Keflioğlu'na göre de Renan ve Littré üzerinden pozitivist düşüncenin etkisi açıktır."},
+ {t:"tf", q:"Münâcât'ın ikinci kısmındaki sorular, Hâmid'de olduğu gibi şüphe ifade eder.", a:false, why:"Yanlış. Kaplan: Tanrı'nın lütfu hakkındaki sorular Hâmid'de olduğu gibi şüphe değil, bilakis iman ve emniyet ifade eder."},
+ {t:"info", kind:"Kaplan'ın tahlili", title:"Sadelik: Münâcât'ın üslubu", poet:"Şinasi", verse:"Ne dedim tevbeler olsun bu da fi'l-i şerdir\nBenim özrüm günehimden iki kat bed-terdir", secs:[
+   {list:["En mühim hususiyeti sadeliktir. Divan şiiri tesadüfen sade olur; Şinasi bilerek sade yazar.","Muhtevada temizlik yapar: lüzumsuz teferruatı atar, bir iki fikri alıp genişletir. Bu bir kompozisyon fikri gösterir.","Mazmunları kaldırır: Münâcât'ta benzetme ve mecaz sayısı dördü geçmez; hiç sanat bulunmayan çıplak mısralar yazar.","Konuşma diline gider, Farsça terkipleri son derece azaltır.","Bu sadeleştirme şuurludur; arkasında bir kültür ve ideoloji vardır.","Eski münâcâtlar minyatüre, Şinasi'ninki sade çizgilerle yapılmış bir desene benzer."]},
+   {h:"Namık Kemal'in hayranlığı", p:"Namık Kemal 1278'de bir ramazan günü Bayezid Camii avlusunda bu şiiri taş baskı bir kâğıtta yirmi paraya alır. Önce Yunus ilahisi sanır. Şiir onun yazısını ve \"milletin lisanını\" değiştirmesine sebep olur, gidip Şinasi'nin gazetesine yardımcı olur. Kaplan: \"Namık Kemal'i yaratan Şinasi'dir.\""},
+   {h:"Açtığı yol", p:"Halka ve halk diline gidiş Yunus'un yoludur. Teşbihe tahammül edemeyen Beşir Fuad ve \"edebiyatsız bir edebiyat\" isteyen Orhan Veli, Şinasi'nin açtığı yoldan gelir."}
+ ]},
+ {t:"mc", q:"Kaplan'a göre Münâcât'ta kaç benzetme ve mecaz vardır?", o:["Dördü geçmez","Her beyitte en az iki tane","Yaklaşık yirmi","Hiç yoktur"], a:0, why:"Bütünüyle şiir, fikir ve duyguların yalın ifadesinden ibaret gibidir; benzetme ve mecazların sayısı dördü geçmez."},
+ {t:"mc", q:"Namık Kemal, Münâcât'ı ilk okuduğunda onu neyle karıştırmıştır?", o:["Derviş Yunus ilahisiyle","Fuzûlî'nin tevhidiyle","Bir Fransız şiiri tercümesiyle","Ziya Paşa'nın Terci-i Bend'iyle"], a:0, why:"\"Üstünde ilahi ünvanını gördüm. Derviş Yunus ilahisi zannettim.\" Kaplan bu benzetmeyi dikkate değer bulur: Şinasi de Yunus gibi halka ve halk diline gider."},
+ {t:"mc", q:"Kaplan, eski münâcâtları minyatüre benzetir. Şinasi'nin Münâcât'ını neye benzetir?", o:["Sade çizgilerle yapılmış bir desene","Renkli bir tezhibe","Bir mimari plana","Bir yağlıboya tabloya"], a:0, why:"Birinde teferruat üzerinde ince işleyen bir kalem, ötekinde birkaç karakteristik hatla bütünü vermek isteyen bir düşünce vardır."}
+]},
+/* ---------- 3 ---------- */
+{ id:"karsilastirma", title:"Âkif Paşa ile Şinasi", steps:[
+ {t:"info", kind:"Karşılaştırma", title:"İki şiir, iki devir, iki medeniyet", table:{head:["","Adem Kasidesi · Âkif Paşa","Münâcât · Şinasi"],rows:[
+   ["Esas aldığı","Yokluk","Varlık"],
+   ["Varlığa bakış","Bedbin; varlık ıztırap verici bir yük","Hayran; kâinat güzel ve manalı"],
+   ["Tanrı","Kaside boyunca görülmez; ancak son beyitte","Kâinatın nizamında görülür"],
+   ["Iztırap","Ağır, karanlık, insanı ezen","Nedamet duygusu; Tanrı'nın lütfuyla yenilir"],
+   ["Akıl–kalp","Eski görüş; medreseli mantık oyunu","\"Aklımca şehâdet lâzım\""],
+   ["Üslup","Süslü; mazmun, kelime oyunu, medrese dili","Sade; mazmunsuz, konuşma diline yakın"],
+   ["Medeniyet","Ahirete yönelen eski medeniyet","Dünyaya dönüşün ifadesi"]
+ ]}, secs:[
+   {h:"Kaplan'ın hükmü", p:"Adem Kasidesi ile Münâcât arasındaki fark, eski edebiyat ile yeni edebiyat arasındaki ayrılığı gösterir. Dinî dünya görüşünden çıkılmıyor, fakat dine bakış tarzı değişiyor: Tanrı sadece ölüm tanrısı değil, aynı zamanda hayat tanrısı oluyor. Varlığı yok etmek isteyen Âkif Paşa ile Tanrı'yı varlıkta arayan Şinasi arasındaki gizli tezat, zamanla büyüyerek muazzam bir medeniyet buhranına dönüşecektir."},
+   {h:"Ortak nokta (Keflioğlu)", p:"Üç metin de (Adem Kasidesi, Münâcât, Terci-i Bend) gelenek ile yeni düşüncenin çatışmasının ürünüdür. Toplum ve yönetim baskısı altındaki aydınlar tepkiden korkup geri adım atar; hiçbiri keskin bir inkâra varmaz."}
+ ]},
+ {t:"sort", q:"Bu özellik hangi şiire ait?", L:"Adem Kasidesi", R:"Münâcât", items:[
+   ["Tanrı'yı varlıkta, yıldızların nizamında arar","R"],
+   ["Redifi bir musallat fikir gibi şiire hükmeder","L"],
+   ["Benzetme ve mecaz sayısı dördü geçmez","R"],
+   ["İçinde bir gazel söylenir","L"],
+   ["Iztırap nedamettir, Tanrı'nın lütfuyla yenilir","R"],
+   ["Medrese lügati ve Farsça terkipler hâkimdir","L"],
+   ["Nirvana'ya benzetilen bir özlem dile gelir","L"],
+   ["İç konuşma: \"Ne dedim, tevbeler olsun\"","R"],
+   ["Dünyaya dönüşün ifadesidir","R"],
+   ["Ölüm fikrine dayanan medeniyetin son şarkısıdır","L"]
+ ]},
+ {t:"mc", q:"Kaplan'a göre Âkif Paşa ile Şinasi'yi karşılaştırdığımızda ne görürüz?", o:["Sadece iki şairi değil; iki devri, iki medeniyeti, iki kâinat anlayışını","İki farklı tasavvuf tarikatını","Aynı dünya görüşünün iki farklı üslubunu","Divan şiirinin iki farklı nazım şeklini"], a:0, why:"\"Adem Kasidesi ile Münâcât'ta biz sadece Âkif Paşa ile Şinasi'yi değil, iki devri, iki medeniyeti, iki kâinat anlayışını görüyoruz.\""},
+ {t:"mc", q:"Münâcât'ta dine bakış nasıl değişir?", o:["Dinî dünya görüşünden çıkılmaz ama Tanrı ölüm tanrısının yanında hayat tanrısı olur","Din tamamen reddedilir","Ahiret inkâr edilir","Tanrı yalnızca ahiretle ilişkilendirilir"], a:0, why:"Kaplan: Ahiret inkâr edilmemekle beraber dünyanın harikuladeliği üzerinde durulur."},
+ {t:"tf", q:"Keflioğlu'na göre Âkif Paşa, Şinasi ve Ziya Paşa, düşüncelerini açıkça savunup keskin bir inkâra varmışlardır.", a:false, why:"Yanlış. Üç metinde de ürkek yapının izleri vardır; tepkiden korkup geri adım atarlar. Toplumsal baskı onları keskin inkârdan uzak tutar."}
+]},
+/* ---------- 4 ---------- */
+{ id:"nkemal", title:"Namık Kemal · Hürriyet Kasidesi", steps:[
+ {t:"info", kind:"Şiir kartı", title:"Hürriyet Kasidesi", poet:"Namık Kemal", verse:"Görüp ahkâm-ı asrı münharif sıdk u selâmetten\nÇekildik izzet ü ikbâl ile bâb-ı hükûmetten", secs:[
+   {h:"Doğuşu", p:"Kıvılcım, Encümen-i Şuarâ'dan Leskofçalı Gâlib'in bir beytidir: \"Olup mecrûh-ı peykân-ı havâdis tâir-i devlet / Demâdem hûn akar çeşmim gibi enzâr-ı milletten.\" Kemal bu beyti okuyunca \"divane gibi\" sokağa fırlar. Kasidenin vezni, kafiyesi ve ilhamı bu beyitten gelir. Bâb-ı Hükûmet'ten çekilme 1867'dedir; bazı beyitleri Londra'da çıkardığı Hürriyet gazetesinde yer alır."},
+   {h:"Ne anlatır?", p:"Zulme karşı çıkan, iktidardan çekilen, vatan, millet ve hürriyet uğrunda her ıztıraba katlanmaya hazır ihtilalci bir insanı ve onun yücelttiği kıymetleri."},
+   {h:"Ana fikir", p:"Vatan, millet ve hürriyet uğrunda çekilen ıztırap şereftir; zulüm hürriyeti yok edemez, çünkü hürriyet insanın düşünme kabiliyetinden doğar."},
+   {h:"Dört kısım (Kaplan)", list:["1–14: Yüksek kıymetleri ortaya koyan prensip beyitleri","15–17: Osmanlı tarihine hayranlık (\"Cihangirâne bir devlet çıkardık bir aşiretten\")","18–24: Korkusuzluk ve şairin şahsi tavrı","25–31: Hürriyet, bir sevgili gibi"]}
+ ]},
+ {t:"mc", q:"Hürriyet Kasidesi'nin ilhamı hangi şairin beytinden gelir?", o:["Leskofçalı Gâlib","Şinasi","Ziya Paşa","Fuzûlî"], a:0, why:"Encümen-i Şuarâ arkadaşı Leskofçalı Gâlib, eski tarzda yazan, tasavvufa meyyal bir şairdi. Kemal kıvılcımı ondan alır, fakat bundan bir ihtilal yangını çıkar."},
+ {t:"mc", q:"Hürriyet Kasidesi esas olarak neyi anlatır?", o:["Zulme karşı çıkan, vatan, millet ve hürriyet uğrunda her ıztıraba katlanan ihtilalci bir insanı","Varlıktan bıkmış bir insanın yokluk özlemini","Bir köylü kızın nişanlı delikanlıya hayranlığını","1908 hürriyetinin doğurduğu anarşiyi"], a:0, why:"Daha ilk beyitten itibaren karşımıza devrin iktidarına bir prensip namına karşı gelen bir ihtilalci tipi çıkar."},
+ {t:"info", kind:"Kaplan'ın tahlili", title:"Kıymetler ve cemiyet mistisizmi", poet:"Namık Kemal", verse:"Ne mümkün zulm ile bî-dâd ile imhâ-yı hürriyet\nÇalış idrâki kaldır muktedirsen âdemiyetten", secs:[
+   {h:"Yüceltilen kıymetler", list:["Sıdk ve selamet, halka hizmet, mazluma yardım","Millet bir cevherdir; yere düşmekle kıymetinden bir şey kaybetmez","Vatan ile fert arasında cevher birliği: vücudumuzun mayası vatan toprağıdır","Fani olan değil, ebedi olan (iyi şöhret) değerlidir","Hürriyet düşünme kabiliyetinin zaruri neticesidir; düşünce yok edilmeden hürriyet yok edilemez","İrade: \"Cihan titrer sebât-ı pây-ı erbâb-ı metânetten\""]},
+   {h:"Cemiyet mistisizmi", p:"Eskinin iktidarı öven dalkavuk şairi yerine, arkasını halka dayayan ihtilal adamı gelir. Edebiyat bir kelime oyunu olmaktan çıkıp bir mizacın, bir fikrin, bir hayatın ifadesi olur. Kaplan, Kemal'i yeni çağın cemiyet mistisizminin bizdeki ilk havarisi sayar: ferdin kendisini yüce kıymetler uğruna feda etmesi."},
+   {h:"Hayatı fikirlerinin tatbikidir", p:"Kemal bu kıymetleri Fransız ihtilalini hazırlayan yazarlardan alır ama milli kültürle kaynaştırır. Onları kendi hayatının esası yapar; tesirinin sırrı buradadır."}
+ ]},
+ {t:"mc", q:"Kaplan, Namık Kemal'i hangi kavramın bizdeki ilk havarisi sayar?", o:["Cemiyet mistisizmi","Panteizm","Saf şiir","Nirvana mistisizmi"], a:0, why:"Cemiyet mistisizmi, din mistisizmi gibi, ferdin yüce kıymetler uğruna kendini feda etmesidir."},
+ {t:"mc", q:"Namık Kemal'e göre hürriyet niçin yok edilemez?", o:["Hürriyet insanın düşünme kabiliyetinin zaruri neticesidir; düşünce yok edilmeden hürriyet yok edilemez","Çünkü padişah onu korur","Çünkü hürriyet bir ahiret nimetidir","Çünkü Batı milletleri onu garanti eder"], a:0, why:"\"Ne mümkün zulm ile bî-dâd ile imhâ-yı hürriyet / Çalış idrâki kaldır muktedirsen âdemiyetten.\" Baskı, aksine direnme gücünü artırır."},
+ {t:"mc", q:"Kasidede hürriyet nasıl sembolize edilir?", o:["Âşık olunan bir sevgili olarak","Bir ateş olarak","Bir kale olarak","Bir yokluk deryası olarak"], a:0, why:"Batı milletlerinin yaptığı gibi hürriyeti bir sevgili şeklinde sembolize eder; on mısra bu sembole ayrılmıştır: \"Ne efsunkâr imişsin ah ey dîdâr-ı hürriyet.\""},
+ {t:"info", kind:"Kaplan'ın tahlili", title:"Namık Kemal'in şiir anlayışı ve kusurları", poet:"Namık Kemal", secs:[
+   {h:"Şiir bir gayenin hizmetinde", p:"Tanzimat'tan sonra şiir kendi dışında bir gayeye bağlanır. Namık Kemal eserleriyle milleti uyandırmak ister; makalesindeki fikirleri nazma geçirir."},
+   {h:"Şinasi'den gelen", p:"Divan mazmunlarını bırakıp yalın fikir ifadesini tercih etmesi, benzetmelerinde \"şahsi\" olmaya çalışması."},
+   {h:"Kusurları", list:["Muhtevada kompozisyon yoktur; şiiri bütün olarak değil, beyitler dizisi olarak görür.","Fazla mücerret kelime, gazeteci dili, halkın bilmediği lügat kelimeleri; Şinasi'nin halka yaklaşma prensibini iyi uygulayamaz.","Nazım sentaksında Âkif Paşa ve Şinasi kadar başarılı değildir; kasideye \"Görüp\" diye başlaması bir zaaftır.","Nesri nazmından üstündür."]},
+   {h:"Değeri", p:"Türk edebiyatında sosyal şiirin, vatan ve hürriyet aşkının ilk ve en kuvvetli örneğidir. Ona \"saf şiir\" gözüyle bakılamaz; kusurlu fakat hayatla dolu bir \"hayat şiiri\"dir. Kaplan onunla mukayese edilebilecek tek örnek olarak Mehmet Âkif'in İstiklal Marşı'nı gösterir. Şekli ise hâlâ bir kasidedir: eski şekil, yeni muhteva."}
+ ]},
+ {t:"mc", q:"Kaplan, Hürriyet Kasidesi'ni hangi tür şiire örnek gösterir?", o:["\"Hayat şiiri\"ne: kusurlu fakat hayatla dolu ve tesirli","\"Saf şiir\"e","Mensur şiire","Tasavvufi şiire"], a:0, why:"Saf şiir dil üzerinde sabırlı bir çalışma meselesidir; hayat şiiri ise yazanın bütün hayatı ve cemiyetin hayatıyla ilgilidir. Bu cinsten bir diğer örnek İstiklal Marşı'dır."},
+ {t:"tf", q:"Kaplan'a göre Namık Kemal, Şinasi'nin halk diline yaklaşma prensibini başarıyla uygulamıştır.", a:false, why:"Yanlış. Kullandığı kelimeler halkın bildiklerinden uzak, lügat malıdır; gazeteci diliyle konuşur."},
+ {t:"mc", q:"Kaplan'a göre Hürriyet Kasidesi'nin teknik bakımdan en büyük kusuru nedir?", o:["Muhtevanın kuvvetli bir kompozisyona sahip olmaması","Aruz veznini kullanması","Çok sade olması","Hiç benzetme içermemesi"], a:0, why:"Düstur niteliğindeki fikirlerle heyecan ifade eden mısralar birbirine karışmıştır; şiir beyitlerden oluşan bir dizi gibidir."}
+]},
+/* ---------- 5 ---------- */
+{ id:"encumen", title:"Ziya Paşa ve Encümen-i Şuarâ", steps:[
+ {t:"info", kind:"Keflioğlu + Kaplan", title:"Ziya Paşa: hayret ve sorgulama", poet:"Ziya Paşa", verse:"Subhâne men tahayyere fî sun'ihi'l-ukûl\nSubhâne men bi-kudretihî ya'cizü'l-fuhûl", secs:[
+   {h:"Terci-i Bend (1859)", p:"Şekilce tamamen Divan'a bağlı, içerikçe kısmen yenidir. Kâinat düzeni, insan, hayvanlar âlemi, dünyadaki zıtlıklar, peygamberlerin çileleri gözden geçirilir. Sürekli soru soran bir şair vardır: \"Yârab nedir bu keşmekeş-i derd-i ihtiyâç / İnsanın ihtiyâcı ki bir lokma nândır.\" Her bendin sonunda gelen vasıta beyti onu inkârdan alıkoyar; şiir Allah'a sığınma ve teslimiyetle biter."},
+   {h:"Kaplan'ın tespiti", p:"Ziya Paşa kâinatta hayret verici bir anlaşılmazlık bulur. Âkif Paşa'nın nefretine karşı Ziya Paşa'nın hayreti, Hâmid'in hayranlığı vardır."},
+   {h:"Terkib-i Bend (ders notu)", p:"Toplumsal eleştiri: \"Pek rengine aldanma felek eski felektir\", \"Zer-dûz pâlân ursan eşek yine eşektir\", \"Îmân ile dîn akçedir erbâb-ı gınâda / Nâmûs u hamiyyet sözü kaldı fukarâda.\""}
+ ]},
+ {t:"mc", q:"Terci-i Bend'de her bendin sonunda tekrarlanan vasıta beytinin işlevi nedir?", o:["Sorgulamalarına rağmen şairi inkârdan alıkoyar, Allah'a teslimiyeti gösterir","Yokluğu över","Hürriyeti sevgili gibi selamlar","Tabiatın güzelliğini tekrar eder"], a:0, why:"\"Subhâne men tahayyere fî sun'ihi'l-ukûl…\": Akılların sanatı karşısında hayrete düştüğü Allah'ı tesbih eder."},
+ {t:"info", kind:"Ders notu · 3. hafta", title:"Encümen-i Şuarâ", secs:[
+   {list:["Mayıs-Haziran 1861'den Ocak 1862'ye kadar sürer.","Hersekli Ârif Hikmet Bey'in Lâleli Çukurçeşme'deki evinde toplanır.","Aynı zevki paylaşan, aynı kültürden gelen insanların dost meclisidir.","Edebiyat tarihlerinin hemen hepsinde \"eski şiirin son temsilcisi\" hükmü yer alır."]},
+   {h:"Bazı üyeler", p:"Osman Şems Efendi, Konîçeli Mûsâ Kâzım Paşa, Kazasker Mustafa İzzet Efendi, Hoca Sâlih Nâilî, Ziyâ Bey (Paşa), Nâmık Kemal, Recâizâde Mehmed Celâl, Sâdullah Râmi Bey, İbrâhim Hâlet Bey, Memduh Fâik Bey…"},
+   {h:"Onları bir araya getiren sebepler", list:["Soy, doğum ya da memuriyet yoluyla Rumeli bağlantısı","Aynı dairede çalışmış iş arkadaşlığı","İtikadi yakınlık: Nakşibendî, Kâdirî, Mevlevî bağlar","Aynı konakların müdavimi olmak (Abdurrahman Sâmi Paşa konağı vb.)","Tekke ve dergâhlarda tanışıklık","Aynı kahvehaneler"]},
+   {h:"Notlardaki örnek şiirler", list:["Kazasker Mustafa İzzet: \"Ey habîb-i kibriyâ v'ey matla'-ı nûr-ı Hüdâ\" (naat)","Konîçeli Kâzım Paşa, Mersiye-i Hüseyn: \"Düşdü Hüseyn atından sahrâ-yı Kerbelâ'ya\"","Osman Şems Efendi, Mersiye: \"Bugün mâh-ı Muharrem vakt-i mâtemdir safâ olmaz\""]}
+ ]},
+ {t:"mc", q:"Encümen-i Şuarâ toplantıları nerede yapılırdı?", o:["Hersekli Ârif Hikmet Bey'in Lâleli'deki evinde","Bâbıâli'de","Tercümân-ı Hakîkat matbaasında","Süleymaniye Camii'nde"], a:0, why:"Toplantılar 1861–1862 arasında Hersekli Ârif Hikmet Bey'in Lâleli Çukurçeşme'deki evinde yapılmıştır."},
+ {t:"match", q:"Mısraları şairleriyle eşleştir.", pairs:[["Düşdü Hüseyn atından sahrâ-yı Kerbelâ'ya","Konîçeli Kâzım Paşa"],["Ey habîb-i kibriyâ v'ey matla'-ı nûr-ı Hüdâ","Kazasker Mustafa İzzet"],["Zer-dûz pâlân ursan eşek yine eşektir","Ziya Paşa"],["Esîr-i aşkın olduk gerçi kurtulduk esâretten","Namık Kemal"]]},
+ {t:"tf", q:"Edebiyat tarihlerinde Encümen-i Şuarâ, yeni şiirin ilk temsilcisi olarak kabul edilir.", a:false, why:"Yanlış. Hemen bütün edebiyat tarihlerinde Encümen-i Şuarâ'nın eski şiirin son temsilcisi olduğu hükmü yer alır."}
+]},
+/* ---------- 6 ---------- */
+{ id:"naci", title:"Muallim Nâcî", steps:[
+ {t:"info", kind:"Ders notu · 3. hafta", title:"Muallim Nâcî (1849–1893)", poet:"Muallim Nâcî", secs:[
+   {list:["İstanbul Saraçhanebaşı'nda doğdu; asıl adı Ömer. Babası ölünce Varna'ya gitti.","Hat hocası Abdülhalim Efendi'nin verdiği ilk mahlası \"Hulûsî\"dir; \"Nâcî\" mahlasını okuduğu bir hikâyenin kahramanından aldı.","Ahmed Midhat'ın isteğiyle Tercümân-ı Hakîkat'in edebî sütununu yönetti (1883). Sütun, eski edebiyat taraftarlarının merkezi oldu.","1887'den itibaren Mecmûa-i Muallim'i çıkardı.","1889'da Stockholm'deki VIII. Müsteşrikler Kongresi Türkçeye hizmetlerinden dolayı ona altın madalya verdi.","\"Gazi Ertuğrul Bey\" manzumesi üzerine II. Abdülhamid onu Osmanlı tarihini yazmakla görevlendirdi. 1893'te kalp krizinden öldü."]},
+   {h:"Edebî kişiliği", p:"Hâmid ve Ekrem'e karşı çıktığı için eski edebiyatın bayraktarı diye tanıtıldı. Oysa eski edebiyatı en iyi bilen, klasik tarza bağlı biri olmakla beraber yeni tarzda da başarılı manzumeler yazdı. Türkçeyi aruza rahatça uydurdu; Fikret, Mehmet Âkif ve Yahya Kemal'in aruzu başarıyla kullanmasının arkasında onun çabaları vardır. Mehmet Âkif Darülfünun'daki ilk dersinde Nâcî'nin \"Tevhid\" şiirini okutmuştur."},
+   {h:"Kaplan'a göre", p:"Şinasi'nin dil inkılabı unutulmuş, Hâmid gramere meydan okumuş, Recâizâde'de dil zevksizleşmişti. Nâcî bu çöküşe karşı dili ve ahengi savundu. Divan şiirini olduğu gibi değil, en iyi taraflarını (kesif ifade, musiki) aldı."}
+ ]},
+ {t:"mc", q:"Muallim Nâcî'nin ilk mahlası nedir ve nereden gelir?", o:["Hulûsî; hat hocasının verdiği mahlas","Nâcî; babasının verdiği ad","Ömer; doğum adı","Muallim; öğretmenlik mesleği"], a:0, why:"Hat muallimi Abdülhalim Efendi'nin verdiği \"Hulûsî\" mahlasıyla sülüs levhalar yazdı. \"Nâcî\" ise okuduğu bir hikâyenin kahramanının adıdır."},
+ {t:"mc", q:"Nâcî'nin hangi eseri Recâizâde Ekrem'in eleştirilerine cevap olarak yazılmıştır?", o:["Demdeme","Âteşpâre","Lugat-ı Nâcî","Esâmî"], a:0, why:"Demdeme, Ekrem'in Zemzeme mukaddimesi ve Takdîr-i Elhân'daki eleştirilerine karşı Saâdet gazetesinde yayımlanan makalelerden oluşur."},
+ {t:"info", kind:"Ders notu · 3. hafta", title:"Nâcî'nin eserleri", poet:"Muallim Nâcî", secs:[
+   {h:"Manzum", list:["Mûsâ b. Ebü'l-Gāzân yahud Hamiyyet: Endülüs Emevîlerinin son kumandanının şehadetini anlatan 266 beyitlik mesnevi","Terkîb-i Bend-i Muallim Nâcî: Rûhî-i Bağdâdî ile Ziyâ Paşa'ya nazire","Âteşpâre: daha çok yeni şekillerle yazılmış şiirler; ilk şöhretini sağladı","Şerâre: gazel, şarkı, kıta, terbî', rubâî","Fürûzan","Sünbüle: \"Küçük Bir Mudhike\" ile sosyal muhtevalı kısa hikâyenin ilk örneklerinden","Zâtü'n-Nitâkayn yahud İbnü'z-Zübeyr: klasik Fransız trajedisi örnek alınmış","Mir'ât-ı Bedâyi' (Mesnevî-i Muallim Nâcî)","Yâdigâr-ı Nâcî: Şeyh Vasfî'nin derlemesi"]},
+   {h:"Mensur", list:["Muallim: Tercümân-ı Hakîkat'teki makaleleri","Demdeme: Ekrem'e cevap","Müdâfaanâme: Mîzan gazetesine karşı","Istılâhât-ı Edebiyye: nazım şekilleri ve edebiyat terimleri","Lugat-ı Nâcî: \"fetva\" kelimesine kadar; gerisini Müstecâbîzâde İsmet tamamladı","Çocuklar İçin Lugat Kitabı","Osmanlı Şairleri","Esâmî: İslam dünyasından 850 şahsiyet hakkında ansiklopedik eser"]}
+ ]},
+ {t:"match", q:"Nâcî'nin eserlerini içerikleriyle eşleştir.", pairs:[["Âteşpâre","İlk şöhretini sağlayan şiirler"],["Istılâhât-ı Edebiyye","Edebiyat terimleri"],["Esâmî","850 şahsiyet hakkında bilgi"],["Sünbüle","\"Küçük Bir Mudhike\"yi içerir"]]},
+ {t:"info", kind:"Şiir kartı", title:"Köylü Kızların Şarkısı", poet:"Muallim Nâcî", verse:"Tepeden nasıl iniyor bakın\nŞu kızın nişanlısı şanlıdır\nYaradan nazardan esirgesin\nKoca dağ gibi delikanlıdır", secs:[
+   {h:"Ne anlatır?", p:"Köylü bir kız, tepeden inen yakışıklı delikanlıyı över, onun nişanlısı olan kızla şakalaşır: kızardığını görür, onu kıskandırır (\"Benim olsa bari şu kahraman / Olamaz ne çare nişanlıdır\"). Sonunda alay eder ve kendi nişanlısının ondan \"daha şanlı, daha anlı\" olduğunu söyler."},
+   {h:"Ana fikir", p:"Köylü gençlerin temiz, saf, hafif ve neşeli duyguları."},
+   {h:"Kaplan'ın tespitleri", list:["Divan şarkısı değildir: Divan'da köylü kızın duygusu hiç konu olmamıştır. Tem tamamen yenidir, muhtemelen Batılı bir şiirden alınmıştır.","Şinasi hariç hiçbir Tanzimat şairi bu kadar halka yakın bir dil kullanmamıştır; halk dilini zevkle kullanmakta Nâcî Şinasi'den de ileridir.","Duygunun gelişmesine göre ince bir tertip vardır; Nâcî iç şeklin, kompozisyonun önemini Servet-i Fünun'dan önce anlamıştır.","Uyarı: Sade ve ahenkli üslup yaratırken muhtevayı fazla hafifletir; muhtevasız şekilcilik de tehlikelidir. Valery: \"son et sens\" (ses ve mana)."]}
+ ]},
+ {t:"mc", q:"Köylü Kızların Şarkısı neyi anlatır?", o:["Bir köylü kızın, nişanlı bir delikanlıyı övüp onun nişanlısıyla şakalaşmasını","Bir köy düğününde yaşanan kavgayı","Köyden şehre göç eden bir kızın hasretini","Savaşa giden nişanlıya ağıtı"], a:0, why:"Kaplan duygunun gelişimini sırayla gösterir: delikanlının tasviri, nişanlı kızla şaka, kıskandırma, alay ve gurur."},
+ {t:"mc", q:"Kaplan'a göre bu şiiri Divan şiirinden ayıran temel yenilik nedir?", o:["Konu ve dil: köylü kızın duygusu ilk kez konu edilir, halk diline çok yakın bir ifade kullanılır","Aruz yerine serbest vezin kullanılması","Tasavvufi bir tem işlemesi","Kaside şeklinde yazılması"], a:0, why:"Hem muhteva hem üslup bakımından yeni bir şiirdir."},
+ {t:"tf", q:"Kaplan'a göre Nâcî, Köylü Kızların Şarkısı'nda kompozisyonun önemini Servet-i Fünunculardan önce anlamış ve uygulamıştır.", a:true, why:"Doğru. Tanzimat şairlerinin çoğu duygularını tertipsiz verirken Nâcî temini ustaca atlamalarla ince bir tertibe göre düzenler."}
+]},
+/* ---------- 7 ---------- */
+{ id:"hamid", title:"Abdülhak Hâmid Tarhan", steps:[
+ {t:"info", kind:"Ders notu · 4. hafta", title:"Hâmid'in hayatı (1852–1937)", poet:"Abdülhak Hâmid", secs:[
+   {list:["Bebek'te, dedesinden kalma yalıda doğdu. Babası tarihçi Hayrullah Efendi; dedesi Hekimbaşı Abdülhak Molla.","Çocukken Paris'e, ardından elçi olan babasıyla Tahran'a gitti.","1883'te Bombay şehbenderi oldu. Veremli eşi Fatma Hanım dönüş yolunda Beyrut'ta öldü; Hâmid Makber'i Beyrut'ta yazmaya başladı.","Londra sefaretinde görev yaptı; İngiliz Nelly Clower ile evlendi. Sonra Lahey ve Brüksel; Nelly'nin ölümünden sonra Lüsyen Hanım ile evlendi.","1914'te Âyan üyesi, 1928'de İstanbul milletvekili oldu. 13 Nisan 1937'de öldü."]},
+   {h:"Edebî yeri", list:["Tanzimat'ın ikinci nesline mensuptur; şekil ve muhtevada gerçek anlamda yenilik yapanların başındadır.","Sosyal meseleleri daha çok ferdî planda ele alır. Yaşarken \"Şâir-i Âzam\" ve \"Dâhî-i Âzam\" unvanlarını aldı.","Konularını kendi hayatından seçer; şiire ilk defa ferdî tecrübeleri sokar.","Tiyatro türünde de birçok eser verdi."]},
+   {h:"İnanç dünyası (Gül 2016)", p:"Şüphe ile iman, isyan ile teslimiyet baş başa gider. Felsefi şüphenin tohumunu atan kişi Felekiyat hocası Hoca Tahsin'dir. Sahrâ'da tabiata yönelir ve panteist, taklidi bir inanç görülür. Garam'da vahdet-i vücûda yaklaşırken panteizme kayar. Sonunda çoğu zaman Tanrı'nın sonsuz kudretine sığınır."}
+ ]},
+ {t:"mc", q:"Hâmid, Makber'i hangi olay üzerine yazmıştır?", o:["Eşi Fatma Hanım'ın Beyrut'ta veremden ölümü","Babasının Tahran'da ölümü","Londra'dan azledilmesi","Osmanlı'nın Balkanlarda yenilmesi"], a:0, why:"Fatma Hanım henüz yirmi altı yaşında Beyrut'ta öldü; Hâmid büyük bir acıyla Makber'i burada yazmaya başladı (ilk neşri 1885)."},
+ {t:"mc", q:"Gül'e göre Hâmid'in zihnine felsefi şüphenin tohumunu atan kişi kimdir?", o:["Hoca Tahsin","Şinasi","Namık Kemal","Ahmed Vefik Paşa"], a:0, why:"Materyalist felsefeye sahip Felekiyat hocası Hoca Tahsin'dir. Kaplan da Tahsin Efendi'nin panteizm telkin ettiğini söyler."},
+ {t:"info", kind:"Ders notu · 4. hafta", title:"Hâmid'in eserleri", poet:"Abdülhak Hâmid", secs:[
+   {h:"Şiir", list:["Sahrâ","Dîvânelikleri yahut Belde (1885)","Bunlar O'dur (1885)","Makber (1885)","Ölü (1885)","Hacle (1885)","Kahbe yahut Bir Sefîlenin Hasbıhâli (1886)","Bâlâdan Bir Ses (1912)","Vâlidem (1913)","İlhâm-ı Vatan (1916)","Garam (1923)"]},
+   {h:"Tiyatro (seçme)", list:["Mâcerâ-yı Aşk (1873), Sabr u Sebat, İçli Kız","Duhter-i Hindû (1876), Nesteren (1878)","Târık yahut Endülüs Fethi (1879)","Tezer, Eşber (1880)","Zeyneb, İlhan, Turhan, Finten, Sardanapal","Tayflar Geçidi, Nazife, Yâdigâr-ı Harb, Ruhlar","Yabancı Dostlar, Arzîler, Hâkan (1935)"]},
+   {p:"Kaplan'ın kitabındaki şiiri ise Külbe-i İştiyak'tır; Hindistan'da yazılmıştır."}
+ ]},
+ {t:"sort", q:"Bu eser şiir mi, tiyatro mu?", L:"Şiir", R:"Tiyatro", items:[
+   ["Makber","L"],["Eşber","R"],["Sahrâ","L"],["Finten","R"],["Ölü","L"],["Târık yahut Endülüs Fethi","R"],["Garam","L"],["Duhter-i Hindû","R"],["Bâlâdan Bir Ses","L"],["Sardanapal","R"]
+ ]},
+ {t:"info", kind:"Şiir kartı", title:"Külbe-i İştiyak", poet:"Abdülhak Hâmid", verse:"Çemendir, bahrdır, kûhsârdır, subh-ı rebîdir\nBu yerlerde doğan bir şâir olmak pek tabiîdir", secs:[
+   {h:"Ne anlatır?", p:"Hindistan'daki büyük tabiat karşısında duyulan derin hayranlığı. Işıklar (güneş, ay, yıldız, şimşek), sesler, ağaçlar, dalgalar, kuşlar, çiçekler, şelaleler… Hepsi şaire bir şiir gibi görünür ve Tanrı'ya doğru uzanır: ağaçlar sonsuzluğu işaret eder, dalgalar Kudret'in perdesini öper."},
+   {h:"Ana fikir", p:"Tabiat ilahî bir güzelliktir; Tanrı bir şairdir, yarattıkları onun şiiridir: \"Ne şâirdir ki Kudret, şi'r söyler döktüğü âsâr.\""},
+   {h:"Dünya görüşü", list:["Âkif Paşa'nın nefretine, Ziya Paşa'nın hayretine karşı kâinat hakkında iyimser ve ulvi bir hayranlık getirir.","Kaynağı Batı'dır: J. J. Rousseau ve romantiklerin tabiatı güzel ve ilahî sayan görüşü.","Fizikten metafiziğe, görünürden görünmeze geçer: hareket noktası varlık, gayesi Tanrı'dır. Varlığa dindarca hayretle bakarak panteizme varır."]},
+   {h:"Üslup (Kaplan)", list:["Türk şiirine dış dünyadan gelen duyular girmeye başlar; önce görme ve ışık, sonra ses.","Kompozisyon dağınıktır; zaman seher olduğu hâlde güneş, ay ve yıldızları bir arada anar.","Şekilden çok ruha önem verir. Duyma, düşünme, hayal kurma ve ifade etme hürriyetini ilan eder; gramere meydan okur.","İsim hâkimdir, sıfat azdır; tabiatı henüz ressam gibi görmez.","Divan'ın unsur şiirinden Batı'nın perspektif tablo şiirine doğru gidiş vardır."]}
+ ]},
+ {t:"mc", q:"Külbe-i İştiyak'ın ana fikri hangisidir?", o:["Tabiat ilahî bir güzelliktir; Tanrı bir şair, yarattıkları onun şiiridir","Varlık ıztıraptır, kurtuluş yokluktadır","Hürriyet düşünme kabiliyetinden doğar","Sonsuzluk özlemi hiçbir kıyıda dinmez"], a:0, why:"\"Ne şâirdir ki Kudret şi'r söyler döktüğü âsâr\" mısraı bu görüşü özetler."},
+ {t:"mc", q:"Kaplan'a göre Hâmid'in tabiat karşısındaki hayranlığının kaynağı nedir?", o:["Batı: J. J. Rousseau ve romantikler","Divan şiirinin bahariyeleri","Halk şiirindeki güzellemeler","Fars mesnevileri"], a:0, why:"Rousseau tabiatın medeniyetten üstün olduğunu söylemiş, bu fikir romantiklere geçmişti. Hâmid bunu Sahrâ'da nazari olarak işler, Hindistan'da gerçekten duyar."},
+ {t:"tf", q:"Kaplan'a göre Külbe-i İştiyak'ta sıkı bir kompozisyon vardır ve zaman birliğine dikkat edilmiştir.", a:false, why:"Yanlış. Kompozisyon çözük ve dağınıktır; seher vakti olduğu hâlde güneşi, ay ışığını, yıldızları ve şimşekleri bir arada anar."},
+ {t:"info", kind:"Makber Mukaddimesi + ders notu + Gül", title:"Makber: mezar başında akıl ile gönül", poet:"Abdülhak Hâmid", verse:"Pîşimde bu secdegâh-ı tevhîd\nAklımda şükûk, dilde ümmîd", secs:[
+   {h:"Ne anlatır?", p:"Eşi Fatma Hanım'ın ölümü karşısındaki acıyı ve bu acının doğurduğu metafizik soruları: Ölüm yokluk mu, başka bir hayat mı? Lâhût nedir, nâsût nedir? Ölüm meselesi zamanla yalnız Fatma Hanım'ın mezarıyla sınırlı kalmaz; tabut ayrılığın ve bilinmeyene geçişin sembolüdür."},
+   {h:"Ana fikir", p:"Ölüm karşısında insan aklı acizdir; şair isyan, şüphe ve teslimiyet arasında gider gelir, sonunda Allah'ın kudretine sığınır: \"Sen Hâlık'ımızsın, ettik îmân / Bir sende bulur bu ye's pâyân.\""},
+   {h:"İsyan: tıfl-ı ekber", p:"Hâmid, yarattıklarını yok eden Tanrı'yı oyuncağını kıran bir çocuğa benzetir: \"Çıktın mı huzûr-ı Kibriyâ'ya? / Bildin mi nedir tıfl-ı ekber?\" Gül'e göre Hâmid'e kadar Allah'ın varlığını bu kadar sorgulayan bir sanatkâr olmamıştır."},
+   {h:"Mukaddime: \"Birkaç Perişan Söz\"", list:["\"En güzel, en büyük, en doğru şiir, bir hakikat-i müdhişenin tazyiki altında hiçbir şey söyleyememektir.\"","\"Makber, hayat-ı edebîmizin kabristanıdır, benim zevâlimdir.\"","\"Makber, edebiyat nokta-i nazarından çirkin bir çocuktur: masum, fakat güzel değil.\""]}
+ ]},
+ {t:"mc", q:"Makber'de geçen \"tıfl-ı ekber\" ifadesiyle Hâmid ne kastetmiştir?", o:["Yarattıklarını yok eden Tanrı'yı oyuncağını kıran bir çocuğa benzeterek isyanını","Ölen eşinin çocukluğunu","Kendi şairliğinin yeni doğduğunu","Hz. Peygamber'in çocukluğunu"], a:0, why:"Tıfl (çocuk) ile ekber (en büyük) bir araya gelir: hem yücelik hem noksanlık. Tanpınar bu ifadenin Victor Hugo için kullanıldığını ve paganizm etkisini hatırlatır."},
+ {t:"mc", q:"Makber Mukaddimesi'ne göre \"en güzel, en büyük, en doğru şiir\" nedir?", o:["Bir hakikat-i müdhişenin baskısı altında hiçbir şey söyleyememek","Kurallara tam uyan bir kaside","Halkın anlayacağı sade bir şarkı","Tabiatı resim gibi tasvir eden şiir"], a:0, why:"Kaplan da bu sözü Hâmid'in estetiğini açıklarken anar: şiir ifade etmekten çok duymaktır."},
+ {t:"mc", q:"Makber'in ana fikrine en uygun ifade hangisidir?", o:["Ölüm karşısında insan aklı acizdir; ruh isyan ile teslimiyet arasında gider gelir","Ölüm bir huzur ülkesidir, arzulanmalıdır","Hürriyet uğrunda ölmek şereftir","Tabiat Tanrı'nın şiiridir"], a:0, why:"Rıza Tevfik: Makber'in bütün felsefesi gönül ile aklın mezar başındaki çatışmasından doğar."}
+]},
+/* ---------- 8 ---------- */
+{ id:"akif", title:"Mehmet Âkif Ersoy", steps:[
+ {t:"info", kind:"Turgay 2012", title:"Mehmet Âkif'in hayatı", poet:"Mehmet Âkif", verse:"Doğrudan doğruya Kur'ân'dan alıp ilhâmı\nAsrın idrâkine söyletmeliyiz İslâm'ı", secs:[
+   {list:["1873'te İstanbul Fatih Sarıgüzel'de doğdu. Annesi Buharalı Emine Şerife Hanım, babası Arnavutluklu Mehmet Tahir Efendi.","Yüksek Baytar Mektebi'ni birincilikle bitirdi; baytarlık işleri müdüriyetinde memur oldu.","Darülfünun'da Osmanlı edebiyatı müderrisliği yaptı; ilk dersinde Muallim Nâcî'nin \"Tevhid\"ini okutup açıkladı.","Burdur milletvekilliği yaptı; İstiklal Marşı'nın şairidir.","Millî Mücadele'de Fatih, Süleymaniye, Beyazıt; Balıkesir Zağanos Paşa (6 Şubat 1920) ve Kastamonu Nasrullah camilerinde vaazlar verdi.","Celâleyn tefsirini 18 defa baştan sona okumuştu.","TBMM'nin verdiği Kur'an meali görevini yaptı ama Türkçe ibadete malzeme yapılmasından çekindiği için teslim etmedi, aldığı parayı iade etti. Meal vasiyeti üzerine yakıldı.","27 Aralık 1936'da İstanbul'da öldü; Edirnekapı'da yatıyor."]}
+ ]},
+ {t:"mc", q:"Mehmet Âkif Darülfünun'daki ilk dersinde hangi şiiri okutup açıklamıştır?", o:["Muallim Nâcî'nin \"Tevhid\"i","Şinasi'nin Münâcât'ı","Namık Kemal'in Hürriyet Kasidesi","Fuzûlî'nin Su Kasidesi"], a:0, why:"Kaynaklara göre ilk dersinde Nâcî'nin meşhur \"Tevhid\" şiirini okuyarak bir ders boyu açıklayıp yazdırmıştır."},
+ {t:"mc", q:"Âkif, Kur'an mealini neden teslim etmemiştir?", o:["Mealin Türkçe ibadet politikasına malzeme yapılmasından çekindiği için","Tamamlayamadığı için","Ücreti az bulduğu için","Mısır'a yerleştiği için"], a:0, why:"Bütün ısrarlara rağmen tercümeyi teslim etmedi, mukaveleyi feshettirip parayı kuruşu kuruşuna iade etti."},
+ {t:"info", kind:"Safahat ve İslamcı görüş", title:"Safahat ve bölümleri", poet:"Mehmet Âkif", secs:[
+   {h:"Safahat'ın yedi kitabı (genel bilgi)", list:["1. Safahat (1911)","2. Süleymaniye Kürsüsünde (1912)","3. Hakkın Sesleri (1913)","4. Fatih Kürsüsünde (1914)","5. Hatıralar (1917)","6. Âsım (1924)","7. Gölgeler (1933)"]},
+   {h:"Kaplan'a göre Safahat", p:"Belli bir bakış açısından tasvir edilen manzum bir romana benzer: sokak, ev, kulübe, saray, meyhane, cami, köy, şehir, zengin, fakir… Âkif tasvirler yapar, portreler çizer, hikâyeler, fıkralar, konuşmalar, vaazlar kullanır. Şiirin hududunu nesir kadar genişletir."},
+   {h:"İslamcı görüş", list:["Eski tip dindar Allah'ı ve ahireti düşünür, cemiyete önem vermez. Âkif'in esas konusu dünya ve cemiyettir.","Din, ihtirasları tanzim eden ve insanları nizama sokan kuvvettir; Müslümanlık dünyayı da düzeltebilir.","Mabede sokağı, dinin içine hayatı sokar.","Şiirlerinin çoğu bir ayetle başlar; ayeti şiirle tefsir eder.","Kaplan: Fikret'teki dinî buhrana karşı imanı müdafaa eden Âkif'tir; Âkif samimiyete sanatı feda eder."]},
+   {h:"Ayetten şiire (Turgay)", list:["Zümer 9, \"Hiç bilenlerle bilmeyenler bir olur mu?\" → \"Olmaz ya… Tabiî… Biri insan, biri hayvan!\" (ilim, maarif)","Yusuf 87, \"Allah'ın rahmetinden ümit kesmeyin\" → \"Âtiyi karanlık görerek azmi bırakmak / Alçak bir ölüm varsa, eminim, budur ancak\"","Âl-i İmrân 102 → \"Fazilet hissi insanlarda Allah korkusundandır\"","Âl-i İmrân 103, birlik (Zağanos Paşa vaazı) → \"Cemaatten uzaklaşmak, uzaklaşmaktır Allah'tan\""]}
+ ]},
+ {t:"match", q:"Safahat kitaplarını yayın sırasına göre düşün: numarasıyla eşleştir.", pairs:[["Süleymaniye Kürsüsünde","2. kitap"],["Fatih Kürsüsünde","4. kitap"],["Âsım","6. kitap"],["Gölgeler","7. kitap"]]},
+ {t:"mc", q:"\"Âtiyi karanlık görerek azmi bırakmak / Alçak bir ölüm varsa, eminim, budur ancak\" mısraları hangi düşünceyi işler?", o:["Ümitsizliğe karşı azim: Allah'ın rahmetinden ümit kesilmez","İlmin cehalete üstünlüğü","Birlik ve beraberlik","Hürriyetin sevgili oluşu"], a:0, why:"Yusuf Suresi 87. ayetin şiirle tefsiridir; şiir \"Ey millet-i merhûme, sakın ye'se kapılma\" diye biter."},
+ {t:"mc", q:"Kaplan'a göre Âkif'i eski tip dindarlardan ayıran özellik nedir?", o:["Esas konusunun dünya ve cemiyet olması; dinin dünyayı da düzeltebileceğine inanması","Sadece ahireti düşünmesi","Tasavvufa çekilmesi","Dini şiire hiç sokmaması"], a:0, why:"Âkif Müslümanlığa sadece bir ahiret dini gözüyle bakmaz. Yunus şehre varıp feryat koparmak ister ama ruhun içinde dolaşır; Âkif şehrin içine gerçekten girer."},
+ {t:"info", kind:"Şiir kartı", title:"Süleymaniye Kürsüsünden (bir parça)", poet:"Mehmet Âkif", verse:"Kim ne söylerse, hemen el vurup alkışlayacak:\n— Yaşasın! — Kim yaşasın? — Ömrü olan. — Şak! Şak! Şak!", secs:[
+   {h:"Ne anlatır?", p:"Süleymaniye kürsüsündeki bir vaizin ağzından, 1908 hürriyetinden sonraki İstanbul'u: çarşı pazar naralarla çalkalanır, kalabalık neyi alkışladığını bilmez, mektepler \"hürriyet zevki\" için kapatılır, gazeteler ayrılık tohumu eker, dine saldırmak vicdan hürriyeti sanılır, borçla Avrupa'ya koşulur."},
+   {h:"Ana fikir", p:"Hakiki hürriyet akıl ve ahlak nizamıyla çatışmaz; ihtirasları başıboş bırakan şuursuzluk hürriyet değil, anarşidir."},
+   {h:"Kaplan'ın tespitleri", list:["Kelimenin tam manasıyla bir sosyal satirdir: hiddet, hiciv, alay.","Gülünç, akıl ve ahlak nizamı ile ihtirasların şuursuz, mekanik hareketleri arasındaki tezattan doğar.","Benzetmeler: zincirden boşanan deliler, dilli düdük, Çamlıbel'e dönmüş şehir, kör çıban.","Âkif kalabalığın dilini, deyimlerini, hatta cümlelerini alır; yine de üslubu çok şahsidir. \"Düdük / hödük\" kafiyesi gülünç bir tesir yaratır.","Haşim akşam karanlığında varlığın dışına çıkmak isterken, Âkif öğle güneşi altında hayatın içine girer."]},
+   {h:"Ümit", p:"Vaiz, dinleyicilerin ümitsizliğe düştüğünü görünce şöyle der: \"Ye'se düşmeyecek zerrece îmânı olan, / Sade siz derdi bulun, sonra kolaydır derman.\""}
+ ]},
+ {t:"mc", q:"Süleymaniye Kürsüsünden parçası neyi eleştirir?", o:["1908 hürriyetini yanlış anlayıp ihtiraslarını başıboş bırakan şuursuz kalabalığı","II. Abdülhamid'in istibdadını","Divan şairlerinin dalkavukluğunu","Servet-i Fünuncuların dilini"], a:0, why:"Galeyanı hürriyet sananlar sarhoş veya deli gibidir; şuursuzluk mekteplere, gazetelere, hükümet dairelerine yayılır."},
+ {t:"mc", q:"Kaplan, Süleymaniye Kürsüsünden parçasını tür olarak nasıl nitelendirir?", o:["Sosyal satir (hiciv ve alay)","Lirik bir aşk şiiri","Pastoral bir tablo","Tasavvufi bir ilahi"], a:0, why:"Âkif'in komiği ve hicvi ahlaki bir gaye taşır; maksadı güldürmek değil, kötülüğü ortaya koymaktır."},
+ {t:"tf", q:"Kaplan'a göre Âkif kalabalığın dilini benimsediği için üslubu kişiliksizdir.", a:false, why:"Yanlış. Şaşılacak taraf, üslubunun herkese benzemekle beraber çok şahsi olmasıdır. Toplama, değiştirme, vezne sokma işi Âkif'in kendi emeğidir."}
+]},
+/* ---------- 9 ---------- */
+{ id:"yk", title:"Yahya Kemal Beyatlı", steps:[
+ {t:"info", kind:"Şiir kartı", title:"Açık Deniz", poet:"Yahya Kemal", verse:"Dindirmez, anladım, bunu hiçbir güzel kıyı;\nBir bitmeyen susuzluğa benzer bu ağrıyı.", secs:[
+   {h:"Ne anlatır?", p:"Balkan şehirlerinde geçen çocukluğunu, akıncı atalarının ihtirasını duyuşunu; ordu mağlup, vatan yaslıyken rüyasına giren fetih hayallerini; sonra \"istemem artık ne yer, ne yâr\" deyip gurbete çıkışını. Garbın ucunda, med zamanında bin başlı bir ejder gibi kükreyen denizle karşılaşır, onun hüznünde kendi ruhunu tanır."},
+   {h:"Ana fikir", p:"İnsan ruhundaki sonsuzluk (hudutları aşma) özlemi hiçbir sınırlı şeyle tatmin edilemez; insan ve tabiat bu hudutlu âlemde ebedî ıztıraba mahkûmdur."},
+   {h:"Üç plan (Kaplan)", list:["Tarihî: Türk tarihi hudutları aşma ihtirasının ifadesidir. \"Her yaz, şimale doğru asırlarca bir koşu.\"","Ferdî: Çocukluğundan beri ruhunda aynı iştiyak; içtimai akıncılık mümkün olmayınca ferdî seyahatle ufukların tadını arar.","Tabii: Deniz de hudutlu olmaktan muzdariptir; şairle deniz arasında bir yakınlık kurulur."]},
+   {h:"Hayat felsefesi", p:"Haşim çirkin realiteden hayali âlemlere kaçar; Yahya Kemal ise tarihin kahramanlık ve güzellik dolu ülkelerine çekilir: \"Mes'uddur o insan ki yaşar hatıralarla / İnsan âlemde hayal ettiği müddetçe yaşar.\""}
+ ]},
+ {t:"mc", q:"Açık Deniz'in ana fikri hangisidir?", o:["İnsan ruhundaki sonsuzluk özlemi hiçbir sınırlı şeyle dindirilemez","Denizcilik Türk tarihinin temelidir","Gurbet insanı olgunlaştırır","Tabiat Tanrı'nın şiiridir"], a:0, why:"Hiçbir güzel kıyı \"bir bitmeyen susuzluğa benzeyen bu ağrı\"yı, yani sonsuzluk iştiyakını gideremez."},
+ {t:"mc", q:"Kaplan'a göre Açık Deniz'deki duygu hangi üç plan içinde gelişir?", o:["Tarihî, ferdî, tabii","Dinî, siyasi, ahlaki","Psikolojik, metafizik, estetik","Şekil, dil, ahenk"], a:0, why:"Hudutları aşma hissi Türk tarihine, şairin kendi macerasına ve denize bağlanır; böylece cihanşümul bir mahiyet kazanır."},
+ {t:"info", kind:"Kaplan'ın tahlili", title:"Yahya Kemal'in şiir anlayışı", poet:"Yahya Kemal", verse:"Aldım Rakofça kırlarının hür havasını,\nDuydum akıncı cedlerimin ihtirasını.", secs:[
+   {h:"Şiir bir duygu meselesidir", p:"Eskiler ve Tanzimat şairleri şiiri fikir meselesi sandı; Servet-i Fünuncular resim sandı; Âkif ve Gökalp bir ideoloji meselesi yaptı. Yahya Kemal şiirin duygu meselesi olduğunu kavradı. Şair fikre duygu ve hayal yoluyla ulaşır."},
+   {h:"Gizli ideoloji, açık güzellik", p:"Onda da ideoloji vardır, ama Gökalp'teki gibi açık değil, \"meyvanın içindeki gıdalı usare gibi\" gizlidir. Faydalıya değil güzele değer verir; asla didaktik değildir."},
+   {h:"Teknik", list:["Şiiri baştan sona gelişen bir oluş, musiki gibi bir akış hâlinde kurar.","İmajları ölçülüdür; Açık Deniz'de çoğunluk hiç benzetmesiz çıplak mısralardır.","Her mısra veya beyit müstakil bir cümledir; kelimeler vezne uymak için ezilmez.","Aruzu yüksek bir musiki vasıtası yapar; dolgun kafiye ve ses ahengi (deniz kısmında kalın ünlüler ağırlıktadır).","İnsandan tabiata, içten dışa gider; Servet-i Fünun ise dıştan içe gidiyordu.","Kelimelerin yaşama kabiliyetini, hakiki Türkçeyi ilk defa idrak eden odur."]},
+   {h:"Vezin tavrı", p:"Kaplan'ın Netice'sine göre Yahya Kemal ile Haşim hece veznini kullanmayı reddeder; Yahya Kemal yeni bir neo-klasisizme başvurur. Serbest vezni de benimsemedi; şiirin \"serbest\"liği onda vezinden değil, didaktizmden ve ideolojiden arınmaktan gelir."},
+   {h:"Eserleri (genel bilgi)", p:"Kendi Gök Kubbemiz, Eski Şiirin Rüzgârıyle, Rubâîler ve Hayyam Rubâîlerini Türkçe Söyleyiş. Kitapları ölümünden sonra yayımlanmıştır."}
+ ]},
+ {t:"mc", q:"Kaplan'a göre Yahya Kemal'in şiirdeki en büyük keşfi nedir?", o:["Şiirin bir fikir değil, duygu meselesi olduğunu kavraması","Şiirin bir resim olduğunu göstermesi","Şiiri ideolojinin hizmetine vermesi","Serbest vezni Türk şiirine getirmesi"], a:0, why:"\"Yahya Kemal, şiirin bir duygu meselesi olduğunu kavramış ve bunu eserleriyle göstermiş olan insandır.\""},
+ {t:"mc", q:"Kaplan, Yahya Kemal'in şiirindeki ideolojiyi neye benzetir?", o:["Meyvanın içindeki gıdalı usareye","Bir bayrağa","Bir minyatüre","Bir yokluk deryasına"], a:0, why:"Gökalp'te açık olan ideoloji, Yahya Kemal'de \"meyvanın içindeki gıdalı usare gibi\" gizlidir."},
+ {t:"tf", q:"Kaplan'a göre Yahya Kemal, Servet-i Fünuncular gibi tabiattan duyguya (dıştan içe) gider.", a:false, why:"Yanlış. Yahya Kemal duygudan tabiata, içten dışa gider; Açık Deniz'de denizi manalı gösteren kendi hisleridir."},
+ {t:"mc", q:"Yahya Kemal'in vezin konusundaki tavrı hangisidir?", o:["Aruzu savunup onu yüksek bir musiki vasıtası yaptı","Heceyi tek millî vezin ilan etti","Serbest vezni başlattı","Vezni tamamen reddetti"], a:0, why:"Herkesin hor görmeye başladığı aruzu, ahengi savunarak yüksek bir musiki vasıtası yaptı (Kaplan)."}
+]},
+/* ---------- 10 · KESİT ---------- */
+{ id:"kesit", title:"Şiirden kesitler", steps:[
+ {t:"info", kind:"Kesit turu", title:"Kesiti oku, şairi ve temayı bul", secs:[
+   {p:"Bu bölümde her soruda bir şiirden kısa bir kesit göreceksin. Önce kesitin hangi şaire ait olduğunu, sonra temasını seçeceksin. Bazı kesitlerde yalnızca şair sorulur. İki aşamadan birini yanlış yaparsan soru birkaç adım sonra tekrar gelir."},
+   {h:"İpuçları", list:["\"adem\" redifi → Âkif Paşa","Yalın dil, Tanrı ve yıldızlar, günah ve af → Şinasi","Vatan, millet, hürriyet, \"biz\" diye konuşan ses → Namık Kemal","Soru soran, hayret eden ses; \"Kimdir…\" → Ziya Paşa","Tabiat, ışık, Kudret; ölüm ve mezar → Abdülhak Hâmid","Halk ağzı, köylü kız, hafif ve ahenkli → Muallim Nâcî","Sokak, konuşma dili, vaaz, ayet, cemiyet → Mehmet Âkif","Akıncı atalar, deniz, gurbet, sonsuzluk → Yahya Kemal"]}
+ ]},
+ {t:"kesit", v:"Ne gam u gussa ne renc ü elem ü bîm ü ümîd\nOlsa şâyeste cihan cân ile cûyâ-yı adem", p:"Âkif Paşa", th:"Yokluğu gamsız, korkusuz, huzurlu bir ülke olarak özleme", why:"Adem Kasidesi. Kaplan bu beyti yokluğun mutlak bir huzur ülkesi olarak gösterildiği yer olarak anır."},
+ {t:"kesit", v:"Kimi sâbit kimi seyyâr be-takdîr-i Kadîr\nTanrı'nın varlığına her biri bürhân-ı münîr", p:"Şinasi", th:"Yıldızların nizamını Tanrı'nın varlığına delil sayma", why:"Münâcât: Duran ya da dolaşan her yıldız, Tanrı'nın varlığını ispat eden parlak bir delildir."},
+ {t:"kesit", v:"Vücudun kim hamîr-i mâyesi hâk-i vatandandır\nNe gam râh-ı vatanda hâk olursa cevr ü mihnetten", p:"Namık Kemal", th:"Vatan uğruna çekilen ıstırabın ve ölümün tabiiliği", why:"Hürriyet Kasidesi: Fert ile vatan arasında cevher birliği vardır; mayamız vatan toprağıdır."},
+ {t:"kesit", v:"Ne âlemdir bu âlem akl u fikri bî-karâr eyler\nHep i'câzât-ı Kudret pîş-i çeşmimden güzâr eyler", p:"Abdülhak Hâmid", th:"Tabiat karşısında duyulan hayranlık ve onda Kudret'i görme", why:"Külbe-i İştiyak'ın ilk mısraları. Kaplan bu mısraları Hâmid'in varlığa dindarca hayretle bakmasına örnek gösterir."},
+ {t:"kesit", v:"Yakışıklıdır seviyor cihan\nOnu ben de pek severim inan\nBenim olsa bari şu kahraman\nOlamaz ne çare nişanlıdır", p:"Muallim Nâcî", th:"Köylü gençlerin saf, şakacı ve neşeli duyguları", why:"Köylü Kızların Şarkısı: Dördüncü parçada şaka, nişanlı kızı kıskandırmaya kadar gider."},
+ {t:"kesit", v:"Yürüyor dine beş on maskara, alkışlanıyor,\nNesl-i hâzır bunu hürriyyet-i vicdan sanıyor.", p:"Mehmet Âkif", th:"1908 hürriyetinin yanlış anlaşılmasını ve şuursuzluğu hicvetme", why:"Süleymaniye Kürsüsünden: Dine hücum etmek vicdan hürriyeti sanılıyor."},
+ {t:"kesit", v:"Bir gün dedim ki istemem artık ne yer, ne yâr!\nÇıktım sürekli gurbete, gezdim diyar diyar;", p:"Yahya Kemal", th:"Sınırları aşma, sonsuzluğu arama isteği", why:"Açık Deniz: İçtimai akıncılık mümkün olmayınca şair ferdî seyahatle ufukların tadını arar."},
+ {t:"kesit", v:"Kimdir bu aczi has kılan nev'-i âdeme\nKimdir bu nev'i eşref eden cümle âleme", p:"Ziya Paşa", th:"İnsanın aczi ve kader üzerine sorgulama", why:"Terci-i Bend'in dokuzuncu bendi. Ziya Paşa'nın şüphesi bazen \"kimdir\" sorusuna kadar gider (Keflioğlu)."},
+ {t:"kesit", v:"Herkese bâr-ı belâ kendisinin varlığıdır\nGam u âlâmdan âzâde berâyâ-yı adem", p:"Âkif Paşa", th:"Varlığı bir yük, yokluğu kurtuluş sayma", why:"Adem Kasidesi: Herkesin belâ yükü kendi varlığıdır; yokluk ise gamdan ve acıdan âzâdedir."},
+ {t:"kesit", v:"Nûr-ı rahmet niye güldürmeye rûy-ı siyehim\nTanrı'nın mağfiretinden de büyük mü günehim", p:"Şinasi", th:"Günahkar kulun Tanrı'nın affına güvenmesi", why:"Münâcât'ın ikinci kısmı. Kaplan'a göre bu sorular şüphe değil, iman ve emniyet ifade eder."},
+ {t:"kesit", v:"Ne efsûnkâr imişsin âh ey dîdâr-ı hürriyet\nEsîr-i aşkın olduk gerçi kurtulduk esâretten", p:"Namık Kemal", th:"Hürriyeti bir sevgili gibi yüceltme", why:"Hürriyet Kasidesi'nin hürriyet kısmı (25–31). On mısra bu sevgili sembolüne ayrılmıştır."},
+ {t:"kesit", v:"Olmaz ya… Tabiî… Biri insan, biri hayvan!\nÖyleyse, \"cehalet\" denilen yüz karasından\nKurtulmaya azmetmeli baştanbaşa millet.", p:"Mehmet Âkif", th:"İlmin üstünlüğü, cehaletten kurtulma çağrısı", why:"Zümer 9. ayetin (\"Hiç bilenlerle bilmeyenler bir olur mu?\") şiirle tefsiri (Turgay)."},
+ {t:"kesit", v:"Sezdim bir âşinâ gibi, heybetli hüznünü!\nRuhunla karşı karşıya kaldım o med günü,", p:"Yahya Kemal", th:"Şairin ruhu ile deniz arasındaki yakınlık", why:"Açık Deniz: Denizin hudutlu olmaktan duyduğu ıstırap şairin ruhuyla buluşur; Kaplan'a göre insana benzer bir deniz \"mit\"i yaratılır."},
+ {t:"kesit", v:"Fese bak fese ne güzel de al\nNe de hoş belindeki morlu şal", p:"Muallim Nâcî", th:"Köylü gençlerin saf, şakacı ve neşeli duyguları", why:"Köylü Kızların Şarkısı: Delikanlının kıyafeti beğenilerek tasvir edilir."},
+ {t:"kesit", v:"İşâret kılmada eşcâr semt-i lâ-tenâhîyi\nÖper emvâc kalkıp perde-i Kudret-penâhîyi", p:"Abdülhak Hâmid", th:"Tabiat karşısında duyulan hayranlık ve onda Kudret'i görme", why:"Külbe-i İştiyak'ın dördüncü parçası: Ağaçlar sonsuzluğu işaret eder, dalgalar Kudret'in perdesini öper."},
+ {t:"kesit", v:"Bu kârgâh-ı sun' aceb dershânedir\nHer nakş bir kitâb-ı ledünden nişânedir", p:"Ziya Paşa", th:"Kâinatı hayretle seyredip sırrını sorgulama", why:"Terci-i Bend'in ilk beyti: Kâinat bir dershanedir, her nakış gizli bir bilgiden işarettir."},
+ {t:"kesit", only:"p", v:"Mâder-i dehr mevâlîdi ki durmaz doğurur\nDer-kenâr etmek içindir anı bâbâ-yı adem", p:"Âkif Paşa", why:"Adem Kasidesi: Varlık-ana doğurur, yokluk-baba alır götürür."},
+ {t:"kesit", only:"p", v:"Hak Teâlâ azamet âleminin pâdişehi\nLâ-mekândır olamaz devletinin taht-gehi", p:"Şinasi", why:"Münâcât'ın ilk beyti. Namık Kemal bu beyti okuyunca şiiri Yunus ilahisi sanmıştı."},
+ {t:"kesit", only:"p", v:"Felek her türlü esbâb-ı cefâsın toplasın gelsin\nDönersem kahbeyim millet yolunda bir azîmetten", p:"Namık Kemal", why:"Hürriyet Kasidesi: Korkusuzluk ve şairin şahsi tavrı (18–24. beyitler)."},
+ {t:"kesit", only:"p", v:"Düşdü Hüseyn atından sahrâ-yı Kerbelâ'ya\nCibrîl var haber ver \"Sultân-ı Enbiyâ\"ya", p:"Konîçeli Kâzım Paşa", why:"Mersiye-i Hüseyn; Encümen-i Şuarâ şairlerinden (ders notu)."},
+ {t:"kesit", only:"p", v:"Bir de İstanbul'a geldim ki: bütün çarşı pazar\nNâradan çalkalanıyor, öyle ya… Hürriyet var!", p:"Mehmet Âkif", why:"Süleymaniye Kürsüsünden'in ilk beyti. Kaplan, Âkif'in konuşma dilini bütün unsurlarıyla benimsediğine örnek gösterir."},
+ {t:"kesit", only:"p", v:"Her yaz, şimâle doğru asırlarca bir koşu\nBağrımda bir akis gibi kalmış uğultulu…", p:"Yahya Kemal", why:"Açık Deniz: Kaplan'a göre bu mısra Türk tarihinin ruhunu, hudutları aşma ihtirasını hulasa eder."},
+ {t:"kesit", only:"p", v:"Hüsn-i Kur'ân'ı görür insân olur hayrân sana\nDest-i kudretle yazılmış hilyedir Kur'ân sana", p:"Muallim Nâcî", why:"Ders notunda Nâcî bölümünde yer alan, Hz. Peygamber'e hitap eden manzume."}
+]},
+/* ---------- 11 ---------- */
+{ id:"karma", title:"Karma tekrar · Kim, ne yazdı?", steps:[
+ {t:"info", kind:"Son tur", title:"Şimdi hepsini karıştırıyoruz", secs:[
+   {p:"Sınavda hoca şair verip eser, ya da şiir verip şair sorabilir. Bu bölümde her iki yönde eşleştirme, mısradan şair bulma ve dünya görüşü soruları var. Yanlış yaptıkların birkaç adım sonra yeniden gelecek."},
+   {h:"Hızlı hatırlatma", list:["Âkif Paşa → Adem Kasidesi (yokluk, bedbinlik)","Şinasi → Münâcât (akıl, kâinatta Tanrı, sadelik)","Namık Kemal → Hürriyet Kasidesi (vatan, millet, hürriyet)","Ziya Paşa → Terci-i Bend, Terkib-i Bend (hayret, sorgulama)","Muallim Nâcî → Köylü Kızların Şarkısı (halk dili, ahenk)","Abdülhak Hâmid → Külbe-i İştiyak, Makber (tabiat hayranlığı, ölüm, şüphe)","Mehmet Âkif → Safahat, Süleymaniye Kürsüsünden (İslamcı, toplumcu)","Yahya Kemal → Açık Deniz (sonsuzluk özlemi, tarih, ahenk)"]}
+ ]},
+ {t:"match", q:"Şiiri şairiyle eşleştir.", pairs:[["Adem Kasidesi","Âkif Paşa"],["Münâcât","Şinasi"],["Hürriyet Kasidesi","Namık Kemal"],["Külbe-i İştiyak","Abdülhak Hâmid"]]},
+ {t:"match", q:"Şiiri şairiyle eşleştir.", pairs:[["Köylü Kızların Şarkısı","Muallim Nâcî"],["Süleymaniye Kürsüsünden","Mehmet Âkif"],["Açık Deniz","Yahya Kemal"],["Terci-i Bend","Ziya Paşa"]]},
+ {t:"match", q:"Eseri yazarıyla eşleştir.", pairs:[["Makber","Abdülhak Hâmid"],["Demdeme","Muallim Nâcî"],["Âsım","Mehmet Âkif"],["Kendi Gök Kubbemiz","Yahya Kemal"]]},
+ {t:"match", q:"Eseri yazarıyla eşleştir.", pairs:[["Sahrâ","Abdülhak Hâmid"],["Âteşpâre","Muallim Nâcî"],["Gölgeler","Mehmet Âkif"],["Lugat-ı Nâcî","Muallim Nâcî"]]},
+ {t:"mc", q:"\"Ne şâirdir ki Kudret, şi'r söyler döktüğü âsâr\" mısraı kime aittir?", o:["Abdülhak Hâmid","Şinasi","Yahya Kemal","Muallim Nâcî"], a:0, why:"Külbe-i İştiyak: Tanrı bir şairdir, tabiat onun şiiridir."},
+ {t:"mc", q:"\"Göremez zâtını mahlûkunun âdî nazarı / Hisseder nûrunu ammâ ki basîret basarı\" beyti kime aittir?", o:["Şinasi","Âkif Paşa","Ziya Paşa","Abdülhak Hâmid"], a:0, why:"Münâcât: Şinasi dış gözden iç göze döner."},
+ {t:"mc", q:"\"Mağlûpken ordu, yaslı dururken bütün vatan / Rüyama girdi her gece bir fâtihâne zan\" beyti kime aittir?", o:["Yahya Kemal","Namık Kemal","Mehmet Âkif","Ziya Paşa"], a:0, why:"Açık Deniz: Yenilginin içinde şair fetih hayalleri kurar; sosyal kurtuluş ümidi kalmayınca ferdî yolculuğa çıkar."},
+ {t:"mc", q:"\"Biz ol nesl-i kerîm-i dûde-i Osmâniyânız kim / Muhammerdir serâpâ mâyemiz hûn-ı şehâdetten\" beyti kime aittir?", o:["Namık Kemal","Ziya Paşa","Âkif Paşa","Mehmet Âkif"], a:0, why:"Hürriyet Kasidesi'nin Osmanlı tarihini yücelten kısmı (15–17. beyitler)."},
+ {t:"mc", q:"\"Ötüyor her taşın üstünde birer dilli düdük / Dinliyor kaplamış etrafını yüzlerce hödük\" beyti kime aittir?", o:["Mehmet Âkif","Ziya Paşa","Muallim Nâcî","Namık Kemal"], a:0, why:"Süleymaniye Kürsüsünden: halk dilindeki \"dilli düdük, ötmek, hödük\" tabirleri bir araya getirilerek gülünç bir tablo kurulur."},
+ {t:"mc", q:"\"Yârab nedir bu keşmekeş-i derd-i ihtiyâç / İnsanın ihtiyâcı ki bir lokma nândır\" beyti kime aittir?", o:["Ziya Paşa","Şinasi","Âkif Paşa","Abdülhak Hâmid"], a:0, why:"Terci-i Bend: insanlar arasındaki kavganın anlamsızlığını sorgular."},
+ {t:"sort", q:"Bu dünya görüşü hangi şaire ait?", L:"Şinasi", R:"Abdülhak Hâmid", items:[
+   ["Tanrı'nın varlığına aklınca şehadet arar","L"],["Tabiat karşısında panteizme varır","R"],["Tanrı'yı \"tıfl-ı ekber\" diye anar","R"],["Ondaki sorular şüphe değil, iman ve emniyet ifade eder","L"],["Rousseau ve romantiklerin tabiat görüşünü alır","R"],["Renan ve Littré ile yakınlaşır","L"]
+ ]},
+ {t:"sort", q:"Bu tespit kimin şiiri için?", L:"Mehmet Âkif", R:"Yahya Kemal", items:[
+   ["İdeoloji açık; şiir vaaz ve satir olur","L"],["İdeoloji \"meyvanın içindeki usare gibi\" gizli","R"],["Safahat manzum bir romana benzer","L"],["Şiir bir duygu meselesidir","R"],["Mabede sokağı, dinin içine hayatı sokar","L"],["Hatıra ve hayal ile mazinin güzelliğini diriltir","R"]
+ ]},
+ {t:"mc", q:"Kaplan'a göre Tanzimat'tan sonraki Türk şairlerini Divan şairlerinden ayıran genel tavır nedir?", o:["Varlığa, tabiata ve cemiyete dönmeleri; onunla daha sıkı münasebet kurmaları","Tasavvufa daha çok yönelmeleri","Şiirde hiç fikre yer vermemeleri","Yalnızca hece veznini kullanmaları"], a:0, why:"Boş ve mücerret bir varlık tasavvurundan dolu ve müşahhas bir varlık idrakine doğru gidilir."}
+]}
+];
+
+/* =========================================================
+   MOTOR
+   ========================================================= */
+const KEY="cagdas-turk-siiri-testi-v1";
+const POETS=["Âkif Paşa","Şinasi","Namık Kemal","Ziya Paşa","Abdülhak Hâmid","Muallim Nâcî","Mehmet Âkif","Yahya Kemal"];
+const $=s=>document.querySelector(s);
+const stage=$("#stage"), nextBtn=$("#next");
+const STEPS=[]; MODULES.forEach((m,mi)=>m.steps.forEach((s,si)=>STEPS.push({...s,mod:mi,id:mi+"."+si})));
+const isQ=s=>s.t!=="info";
+
+let S=null;
+function fresh(skipInfo){
+  const deck=STEPS.map((_,i)=>i).filter(i=>!(skipInfo&&!isQ(STEPS[i])));
+  return {deck, pos:0, maxPos:0, lastAns:-1, retry:{}, stats:{}, streak:0, best:0, skipInfo:!!skipInfo, finished:false, wrongIds:[]};
+}
+function load(){ try{ const r=localStorage.getItem(KEY); if(r){ const o=JSON.parse(r); if(o&&Array.isArray(o.deck)&&o.deck.every(i=>STEPS[i])) return o; } }catch(e){} return null; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+S=load()||fresh(false);
+if(S.maxPos==null) S.maxPos=S.pos;
+if(S.lastAns==null) S.lastAns=-1;
+const reviewing=()=>S.pos<S.maxPos || S.lastAns===S.pos;
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function esc(t){ return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function record(idx, ok){
+  if(reviewing()) return; // geri dönülen adımlar puanı ve tekrar sırasını etkilemez
+  S.lastAns=S.pos;
+  const st=STEPS[idx]; const m=st.mod;
+  S.stats[m]=S.stats[m]||{seen:0,first:0};
+  const firstTime = !S.retry[idx+"_done"];
+  if(firstTime){ S.stats[m].seen++; if(ok) S.stats[m].first++; S.retry[idx+"_done"]=1; }
+  if(ok){ S.streak++; S.best=Math.max(S.best,S.streak); }
+  else{
+    S.streak=0;
+    if(!S.wrongIds.includes(idx)) S.wrongIds.push(idx);
+    const at=Math.min(S.pos+4, S.deck.length);
+    S.deck.splice(at,0,idx);
+    S.retry[idx]=(S.retry[idx]||0)+1;
+  }
+  save(); hud();
+}
+
+function hud(){
+  const st=STEPS[S.deck[Math.min(S.pos,S.deck.length-1)]];
+  const m=MODULES[st.mod];
+  $("#chapter").innerHTML=`<small>Bölüm ${st.mod+1} / ${MODULES.length}</small><span>${esc(m.title)}</span>`;
+  let seen=0,first=0; Object.values(S.stats).forEach(v=>{seen+=v.seen;first+=v.first;});
+  $("#acc").textContent= seen? Math.round(first/seen*100)+"%" : "–";
+  $("#streak").textContent=S.streak;
+  const before=new Set(S.deck.slice(0,S.pos)); const remainingRetries=S.deck.slice(S.pos).filter(i=>before.has(i)).length;
+  $("#queue").textContent=remainingRetries;
+  const pct= S.finished?100: Math.round(S.pos/S.deck.length*100);
+  $("#fill").style.width=pct+"%";
+  $("#pos").textContent= S.finished? "Tamamlandı" : `Adım ${S.pos+1} / ${S.deck.length}`;
+  $("#modeQ").setAttribute("aria-pressed", S.skipInfo?"true":"false");
+}
+
+let onNext=null;
+function setNext(label, enabled, fn){ nextBtn.textContent=label; nextBtn.disabled=!enabled; onNext=fn; }
+nextBtn.addEventListener("click",()=>{ if(!nextBtn.disabled&&onNext) onNext(); });
+function advance(){ S.pos++; S.maxPos=Math.max(S.maxPos,S.pos); if(S.pos>=S.deck.length){ S.finished=true; } save(); render(); window.scrollTo({top:0,behavior:"smooth"}); }
+function skipQ(){
+  // cevaplanmadan geçilen soru puanı etkilemez, akisin sonuna eklenir
+  if(S.pos>=S.deck.length-1){ advance(); return; }
+  const idx=S.deck.splice(S.pos,1)[0]; S.deck.push(idx);
+  S.skipped=(S.skipped||0)+1;
+  save(); render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+const backBtn=$("#back");
+function goBack(){
+  if(S.finished){ S.finished=false; S.pos=S.deck.length-1; }
+  else if(S.pos>0){ S.pos--; } else return;
+  save(); render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+backBtn.addEventListener("click",goBack);
+
+function render(){
+  hud();
+  backBtn.disabled = !S.finished && S.pos===0;
+  if(S.finished) return renderEnd();
+  const idx=S.deck[S.pos], st=STEPS[idx];
+  const isRetry = S.deck.slice(0,S.pos).includes(idx);
+  ({info:renderInfo, mc:renderMC, tf:renderTF, match:renderMatch, sort:renderSort, kesit:renderKesit})[st.t](st, idx, isRetry);
+  if(nextBtn.disabled) setNext("Atla →", true, reviewing()? advance : skipQ);
+}
+
+function head(st,isRetry){
+  const kind = st.t==="info" ? st.kind : ({mc:"Soru",tf:"Doğru mu, yanlış mı?",match:"Eşleştirme",sort:"Hangisi?",kesit:"Şiirden kesit"})[st.t];
+  const rv = reviewing() ? '<span class="review-tag">Gözden geçirme · puan sayılmaz · </span>' : '';
+  return `<div class="kind">${rv}${isRetry&&!rv?'<span class="retry-tag">Tekrar · </span>':''}${esc(kind)}</div>`;
+}
+
+function renderInfo(st){
+  let h=`<article class="card">${head(st)}<h1>${esc(st.title)}</h1>`;
+  if(st.poet) h+=`<p class="src">${esc(st.poet)}</p>`;
+  if(st.verse) h+=`<div class="verse">${esc(st.verse)}</div>`;
+  if(st.table){ h+=`<div class="tbl"><table><thead><tr>${st.table.head.map(x=>`<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>${st.table.rows.map(r=>`<tr>${r.map((c,i)=>i?`<td>${esc(c)}</td>`:`<th scope="row">${esc(c)}</th>`).join("")}</tr>`).join("")}</tbody></table></div>`; }
+  (st.secs||[]).forEach(s=>{ h+=`<section class="sec">${s.h?`<h2>${esc(s.h)}</h2>`:""}${s.p?`<p>${esc(s.p)}</p>`:""}${s.list?`<ul>${s.list.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}</section>`; });
+  h+=`</article>`;
+  stage.innerHTML=h;
+  setNext("Okudum, soruya geç", true, advance);
+}
+
+function feedback(ok, why){
+  const d=document.createElement("div"); d.className="fb "+(ok?"ok":"no");
+  d.innerHTML=`<strong>${ok?"Doğru.":(reviewing()?"Yanlış.":"Yanlış. Bu soru birkaç adım sonra tekrar gelecek.")}</strong>${why?`<span>${esc(why)}</span>`:""}`;
+  return d;
+}
+
+function renderChoice(st, idx, isRetry, opts, correctIdx){
+  const order = opts.length>2 ? shuffle(opts.map((_,i)=>i)) : opts.map((_,i)=>i);
+  stage.innerHTML=`<article class="card">${head(st,isRetry)}<p class="q">${esc(st.q)}</p><div class="opts">${order.map((oi,k)=>`<button class="opt" type="button" data-i="${oi}"><span class="k">${k+1}</span><span>${esc(opts[oi])}</span></button>`).join("")}</div></article>`;
+  const card=stage.querySelector(".card");
+  setNext("Devam", false, null);
+  stage.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+    const pick=+b.dataset.i, ok=pick===correctIdx;
+    stage.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(+x.dataset.i===correctIdx) x.classList.add("ok"); });
+    if(!ok) b.classList.add("no");
+    card.appendChild(feedback(ok, st.why));
+    record(idx, ok);
+    setNext("Devam", true, advance); nextBtn.focus();
+  }));
+}
+function renderMC(st,idx,r){ renderChoice(st,idx,r,st.o,st.a); }
+function renderTF(st,idx,r){ renderChoice(st,idx,r,["Doğru","Yanlış"], st.a?0:1); }
+
+function renderKesit(st, idx, isRetry){
+  const poetOpts=shuffle([st.p, ...shuffle(POETS.filter(x=>x!==st.p)).slice(0,3)]);
+  let themeOpts=null;
+  if(st.only!=="p"){
+    const pool=[...new Set(STEPS.filter(s=>s.t==="kesit"&&s.th&&s.p!==st.p).map(s=>s.th))].filter(x=>x!==st.th);
+    themeOpts=shuffle([st.th, ...shuffle(pool).slice(0,3)]);
+  }
+  const stages = themeOpts ? 2 : 1;
+  stage.innerHTML=`<article class="card">${head(st,isRetry)}<div class="verse">${esc(st.v)}</div><div id="kq"></div></article>`;
+  const card=stage.querySelector(".card"), kq=card.querySelector("#kq");
+  let allOk=true;
+  setNext("Devam", false, null);
+  function ask(label, opts, correct, isLast){
+    const box=document.createElement("div"); box.className="sec"; box.style.gap="10px";
+    box.innerHTML=`<p class="q">${esc(label)}</p><div class="opts">${opts.map((o,k)=>`<button class="opt" type="button" data-v="${esc(o)}"><span class="k">${k+1}</span><span>${esc(o)}</span></button>`).join("")}</div>`;
+    kq.appendChild(box);
+    box.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+      const ok=b.dataset.v===correct; if(!ok) allOk=false;
+      box.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(x.dataset.v===correct) x.classList.add("ok"); });
+      if(!ok) b.classList.add("no");
+      if(!isLast){
+        const note=document.createElement("p"); note.className="src"; note.textContent= ok?"Doğru şair. Şimdi temayı seç.":`Şair: ${correct}. Şimdi temayı seç.`; box.appendChild(note);
+        ask("Bu kesitin teması nedir?", themeOpts, st.th, true);
+      } else {
+        card.appendChild(feedback(allOk, (stages===2&&!allOk?`Şair: ${st.p}. Tema: ${st.th}. `:"")+(st.why||"")));
+        record(idx, allOk); setNext("Devam", true, advance); nextBtn.focus();
+      }
+    }));
+  }
+  ask("Bu kesit hangi şaire ait?", poetOpts, st.p, stages===1);
+}
+
+function renderMatch(st, idx, isRetry){
+  const L=shuffle(st.pairs.map((p,i)=>i)), R=shuffle(st.pairs.map((p,i)=>i));
+  stage.innerHTML=`<article class="card">${head(st,isRetry)}<p class="q">${esc(st.q)}</p><p class="src">Soldan birini, sonra sağdan karşılığını seç.</p>
+   <div class="match"><div class="col">${L.map(i=>`<button class="mi" type="button" data-side="L" data-i="${i}">${esc(st.pairs[i][0])}</button>`).join("")}</div>
+   <div class="col">${R.map(i=>`<button class="mi" type="button" data-side="R" data-i="${i}">${esc(st.pairs[i][1])}</button>`).join("")}</div></div></article>`;
+  const card=stage.querySelector(".card");
+  let selL=null, selR=null, errors=0, done=0;
+  setNext("Devam", false, null);
+  const same=(a,b)=>st.pairs[a][1]===st.pairs[b][1]; // aynı sağ değerli eşler (ör. iki Nâcî eseri) birbirinin yerine geçebilir
+  function tryPair(){
+    if(selL==null||selR==null) return;
+    const lb=stage.querySelector(`.mi[data-side="L"][data-i="${selL}"]`), rb=stage.querySelector(`.mi[data-side="R"][data-i="${selR}"]`);
+    if(selL===selR || same(selL,selR)){
+      lb.className="mi done"; rb.className="mi done"; lb.disabled=rb.disabled=true; done++;
+    } else {
+      errors++; [lb,rb].forEach(b=>{b.classList.remove("sel");b.classList.add("shake");setTimeout(()=>b.classList.remove("shake"),350);});
+    }
+    selL=selR=null;
+    if(done===st.pairs.length){
+      const ok=errors===0;
+      card.appendChild(feedback(ok, ok? (st.why||"Hepsini ilk denemede eşleştirdin.") : `${errors} hatalı deneme. ${st.why||""}`));
+      record(idx, ok); setNext("Devam", true, advance); nextBtn.focus();
+    }
+  }
+  stage.querySelectorAll(".mi").forEach(b=>b.addEventListener("click",()=>{
+    if(b.classList.contains("done")) return;
+    const side=b.dataset.side, i=+b.dataset.i;
+    stage.querySelectorAll(`.mi[data-side="${side}"]`).forEach(x=>{ if(!x.classList.contains("done")) x.classList.remove("sel"); });
+    b.classList.add("sel");
+    if(side==="L") selL=i; else selR=i;
+    tryPair();
+  }));
+}
+
+function renderSort(st, idx, isRetry){
+  const items=shuffle(st.items); let k=0, errors=0; const res=[];
+  stage.innerHTML=`<article class="card">${head(st,isRetry)}<p class="q">${esc(st.q)}</p>
+   <div class="dots">${items.map(()=>`<span class="dot"></span>`).join("")}</div>
+   <div class="stmt" id="stmt"></div>
+   <div class="sides"><button class="side" type="button" data-s="L"><span class="k">1</span> ${esc(st.L)}</button><button class="side" type="button" data-s="R"><span class="k">2</span> ${esc(st.R)}</button></div>
+   <div id="sfb"></div></article>`;
+  const card=stage.querySelector(".card"), dots=stage.querySelectorAll(".dot");
+  setNext("Devam", false, null);
+  function show(){ dots.forEach((d,i)=>d.classList.toggle("cur",i===k)); $("#stmt").textContent=items[k][0]; }
+  show();
+  stage.querySelectorAll(".side").forEach(b=>b.addEventListener("click",()=>{
+    if(k>=items.length) return;
+    const ok=b.dataset.s===items[k][1];
+    dots[k].classList.add(ok?"ok":"no"); if(!ok){ errors++; res.push(items[k]); }
+    const f=$("#sfb"); f.innerHTML="";
+    if(!ok){ const d=document.createElement("div"); d.className="fb no"; d.innerHTML=`<strong>Yanlış.</strong><span>"${esc(items[k][0])}" → ${esc(items[k][1]==="L"?st.L:st.R)}</span>`; f.appendChild(d); }
+    k++;
+    if(k<items.length){ show(); }
+    else {
+      dots.forEach(d=>d.classList.remove("cur")); $("#stmt").textContent="Bitti.";
+      stage.querySelectorAll(".side").forEach(x=>x.disabled=true);
+      const ok2=errors===0;
+      f.innerHTML=""; f.appendChild(feedback(ok2, ok2?`${items.length} ifadenin hepsi doğru.`:`${items.length} ifadeden ${errors} tanesini karıştırdın.`));
+      record(idx, ok2); setNext("Devam", true, advance); nextBtn.focus();
+    }
+  }));
+}
+
+function renderEnd(){
+  let seen=0,first=0; Object.values(S.stats).forEach(v=>{seen+=v.seen;first+=v.first;});
+  const rows=MODULES.map((m,i)=>{ const v=S.stats[i]; if(!v||!v.seen) return ""; const p=Math.round(v.first/v.seen*100);
+    return `<div class="rrow"><span>${esc(m.title)}</span><b style="font-variant-numeric:tabular-nums">${v.first}/${v.seen}</b><div class="rbar"><i style="width:${p}%"></i></div></div>`; }).join("");
+  const weak=MODULES.map((m,i)=>({m,i,v:S.stats[i]})).filter(x=>x.v&&x.v.seen&&x.v.first/x.v.seen<.75).map(x=>x.m.title);
+  stage.innerHTML=`<article class="card"><div class="kind">Sonuç</div><h1>Akış tamamlandı</h1>
+    <div class="row" style="align-items:end;gap:28px"><div><div class="big">${seen?Math.round(first/seen*100):0}%</div><p class="src">ilk denemede doğru</p></div><div><div class="big">${S.best}</div><p class="src">en uzun seri</p></div><div><div class="big">${S.wrongIds.length}</div><p class="src">en az bir kez yanlış yapılan soru</p></div></div>
+    <section class="sec"><h2>Bölümlere göre</h2><div class="res">${rows}</div></section>
+    ${weak.length?`<section class="sec"><h2>Tekrar etmen gerekenler</h2><p>${esc(weak.join(" · "))}</p></section>`:""}
+    <div class="row"><button class="btn" type="button" id="redoWrong" ${S.wrongIds.length?"":"disabled"}>Yanlış yaptıklarımı yeniden çöz</button><button class="btn ghost" type="button" id="redoAll">Baştan başla</button></div></article>`;
+  setNext("Bitti", false, null);
+  $("#redoAll").onclick=()=>{ S=fresh(S.skipInfo); save(); render(); };
+  const rw=$("#redoWrong"); if(rw) rw.onclick=()=>{ const w=S.wrongIds.slice(); const sk=S.skipInfo; S=fresh(sk); S.deck=shuffle(w); save(); render(); };
+}
+
+$("#restart").addEventListener("click",()=>{ S=fresh(S.skipInfo); save(); render(); window.scrollTo({top:0}); });
+$("#modeQ").addEventListener("click",()=>{
+  const sk=!S.skipInfo;
+  if(S.finished||S.pos===0){ S=fresh(sk); }
+  else {
+    const cur=S.deck[S.pos];
+    const rest=S.deck.slice(S.pos).filter(i=>!(sk&&!isQ(STEPS[i])));
+    let tail=rest;
+    if(!sk){ // bilgi kartlarını geri ekle: kalan sorulardan önce gelen bilgi kartlarını sıraya koy
+      const lastDone=S.deck.slice(0,S.pos); const maxDone=lastDone.length?Math.max(...lastDone):-1;
+      tail=STEPS.map((_,i)=>i).filter(i=>i>maxDone && (!isQ(STEPS[i]) || rest.includes(i)));
+      rest.forEach(i=>{ if(i<=maxDone) tail.push(i); });
+    }
+    S.deck=S.deck.slice(0,S.pos).concat(tail.length?tail:[cur]);
+    S.skipInfo=sk;
+  }
+  save(); render();
+});
+document.addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==="ArrowLeft"&&!backBtn.disabled){ e.preventDefault(); goBack(); return; }
+  if(e.key==="Enter"&&!nextBtn.disabled&&onNext!==skipQ&&document.activeElement?.tagName!=="BUTTON"){ e.preventDefault(); nextBtn.click(); return; }
+  const n=parseInt(e.key,10);
+  if(n>=1&&n<=4){
+    const opts=stage.querySelectorAll(".opt:not([disabled])"); if(opts[n-1]){ opts[n-1].click(); return; }
+    const sides=stage.querySelectorAll(".side:not([disabled])"); if(sides[n-1]) sides[n-1].click();
+  }
+});
+render();
+</script>
+
+</body>
+</html>
